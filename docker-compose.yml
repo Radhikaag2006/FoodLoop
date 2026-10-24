@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: foodloop
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: foodloop
+    volumes: [pgdata:/var/lib/postgresql/data]
+  web:
+    build: .
+    restart: always
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://foodloop:${DB_PASSWORD}@db:5432/foodloop
+      UPLOAD_DIR: /srv/uploads
+    depends_on: [db]
+    ports: ["8000:8000"]
+    volumes: [uploads:/srv/uploads]
+volumes:
+  pgdata:
+  uploads:

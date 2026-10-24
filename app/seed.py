@@ -1,0 +1,151 @@
+"""First-run setup.
+
+bootstrap(): creates the platform admin from ADMIN_EMAIL/ADMIN_PASSWORD.
+seed_demo(): FICTIONAL businesses, facilities and lots (only when
+DEMO_MODE=1). Never use demo data for real
+users. Demo password for every demo account: Demo@1234
+"""
+import logging
+import sys
+from datetime import timedelta, date
+
+from sqlalchemy import select
+
+from . import config as C
+from .clock import utcnow
+from .db import Base, engine, SessionLocal
+from .matching import plan_pickups
+from .models import Org, User, Facility, Lot
+from .records import create_record
+from .security import hash_pw
+from .tiers import classify
+
+log = logging.getLogger("foodloop")
+
+DEMO_PW = "Demo@1234"
+FACILITIES = [
+    # name, kind, tiers, lat, lng, cap, certified, rate, cert
+    ("Demo Rescue Kitchen (NGO)", "ngo", "A", 28.480, 77.495,
+     200, False, 0.0, ""),
+    ("Demo Community Kitchen, Noida", "ngo", "A", 28.570, 77.320,
+     150, False, 0.0, ""),
+    ("Demo Pulp and Pickle Unit", "processor", "B", 28.469, 77.530,
+     500, False, 4.0, ""),
+    ("Demo Pulp Unit 2, Noida", "processor", "B", 28.620, 77.380,
+     400, False, 3.5, ""),
+    ("Demo Feed Mill, Dadri", "feed", "C", 28.548, 77.550,
+     2000, False, 1.5, ""),
+    ("Demo Cattle-feed Co-op", "feed", "C", 28.590, 77.425,
+     1000, False, 1.0, ""),
+    ("Demo Compost Unit, Surajpur", "compost", "D", 28.459, 77.520,
+     3000, True, -1.5, "DEMO-C-001"),
+    ("Demo Biogas Plant, Dadri", "biogas", "D", 28.560, 77.570,
+     10000, True, -1.0, "DEMO-B-002"),
+    ("Demo Anaerobic Digester, Noida", "biogas", "D", 28.580, 77.350,
+     5000, True, -2.0, "DEMO-B-003"),
+    ("Demo Packaging Recycler", "recycler", "E", 28.660, 77.440,
+     2000, True, 2.0, "DEMO-R-004"),
+]
+
+
+def reset():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
+
+def bootstrap():
+    db = SessionLocal()
+    try:
+        if db.scalar(select(User).where(User.role == "admin")):
+            return
+        email, pw = C.ADMIN_EMAIL, C.ADMIN_PASSWORD
+        if not (email and pw):
+            if C.IS_PROD:
+                log.warning("No admin yet. Set ADMIN_EMAIL and "
+                            "ADMIN_PASSWORD, then restart.")
+                return
+            email, pw = "admin@foodloop.local", DEMO_PW
+            log.warning("Dev admin created: %s / %s", email, pw)
+        db.add(User(name="FoodLoop Admin", email=email.lower(),
+                    role="admin", pw_hash=hash_pw(pw)))
+        db.commit()
+    finally:
+        db.close()
+
+
+def _user(db, name, phone, role, org=None):
+    u = User(name=name, phone=phone, role=role, status="active",
+             org_id=org.id if org else None, pw_hash=hash_pw(DEMO_PW))
+    db.add(u)
+    db.flush()
+    return u
+
+
+def seed_demo():
+    db = SessionLocal()
+    try:
+        if db.scalars(select(Org)).first():
+            return
+        dist = Org(name="Demo Distributors Pvt Ltd", kind="business",
+                   business_type="distributor", fssai_no="DEMO-FSSAI-1",
+                   lat=28.530, lng=77.400, city="Greater Noida",
+                   address="Ecotech, Greater Noida (demo)",
+                   contact_phone="9000000005", verify_status="verified")
+        mfg = Org(name="Demo Foods Manufacturing", kind="business",
+                  business_type="manufacturer", fssai_no="",
+                  lat=28.510, lng=77.540, city="Greater Noida",
+                  address="Surajpur (demo)", contact_phone="9000000006",
+                  verify_status="pending")
+        db.add_all([dist, mfg])
+        db.flush()
+        for f in FACILITIES:
+            db.add(Facility(name=f[0], kind=f[1], tiers=f[2], lat=f[3],
+                            lng=f[4], capacity_kg=f[5], certified=f[6],
+                            rate_per_kg=f[7], cert_no=f[8],
+                            address="Demo address", phone=""))
+        _user(db, "Rohit Gupta", "9000000005", "business", dist)
+        _user(db, "Neha Singh", "9000000006", "business", mfg)
+        _user(db, "Imran Khan", "9000000007", "hub")
+
+        today = date.today()
+        for org, item, cond, kg, days in (
+                (dist, "biscuits", "fresh", 40, -20),
+                (dist, "dairy", "fresh", 25, -3),
+                (dist, "bread", "fresh", 15, -5),
+                (mfg, "ready_pack", "fresh", 30, -10)):
+            exp = today + timedelta(days=days)
+            t = classify(item, cond, expiry=exp)
+            db.add(Lot(org_id=org.id, item=item, condition=cond,
+                       qty_kg=kg, expiry=exp, tier=t["tier"],
+                       created_at=utcnow() - timedelta(days=9)))
+        db.commit()
+        # close one older run so Records and the audit trail have data
+        created, _ = plan_pickups(db, 5)
+        for p in created[:2]:
+            p.status, p.closed_at = "closed", utcnow() - timedelta(days=6)
+            p.hub_kg = round(p.expected_kg * 1.01, 1)
+            p.facility_kg = round(p.expected_kg * 1.0, 1)
+            db.flush()
+            create_record(db, p)
+        db.add(Lot(org_id=dist.id, item="dairy", condition="fresh",
+                   qty_kg=18, expiry=today - timedelta(days=2),
+                   tier="D"))
+        db.commit()
+    finally:
+        db.close()
+
+
+def init():
+    Base.metadata.create_all(engine)
+    bootstrap()
+    if C.DEMO_MODE:
+        seed_demo()
+
+
+if __name__ == "__main__":
+    if "--reset" in sys.argv:
+        reset()
+    if "--demo" in sys.argv:
+        C.DEMO_MODE = True
+    init()
+    print("Done.")

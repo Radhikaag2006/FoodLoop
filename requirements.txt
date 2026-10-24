@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+sqlalchemy>=2.0
+python-multipart
+itsdangerous
+segno
+reportlab
+psycopg2-binary
+pytest
+httpx
