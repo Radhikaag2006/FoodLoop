@@ -131,3 +131,29 @@ def test_a_strong_admin_password_is_still_accepted_in_production(
         "identifier": "boss@example.com",
         "password": "A-Long-Private-Pass-9"})
     assert r.status_code == 200
+
+
+# ---------- nothing about demos is shipped to the browser in production ----
+def test_website_files_do_not_contain_the_demo_password():
+    import glob
+    files = glob.glob("static/js/*.js") + glob.glob("templates/*.html")
+    leaks = [f for f in files if "Demo@1234" in open(f, encoding="utf-8").read()]
+    assert leaks == []
+
+
+def test_demo_logins_are_sent_only_when_demo_mode_is_on(anon, monkeypatch):
+    monkeypatch.setattr(C, "DEMO_MODE", False)           # production
+    cat = anon.get("/api/catalog").json()
+    assert cat["demo_accounts"] == [] and cat["demo_password"] == ""
+    assert "Demo@1234" not in anon.get("/api/catalog").text
+    monkeypatch.setattr(C, "DEMO_MODE", True)            # a laptop
+    monkeypatch.setattr(C, "ADMIN_EMAIL", "")
+    monkeypatch.setattr(C, "ADMIN_PASSWORD", "")
+    cat = anon.get("/api/catalog").json()
+    labels = [a[0] for a in cat["demo_accounts"]]
+    assert labels == ["Business", "Collector", "FoodLoop admin"]
+    assert cat["demo_password"] == "Demo@1234"
+    monkeypatch.setattr(C, "ADMIN_EMAIL", "boss@example.com")
+    monkeypatch.setattr(C, "ADMIN_PASSWORD", "Boss-Pass-123")
+    labels = [a[0] for a in anon.get("/api/catalog").json()["demo_accounts"]]
+    assert "FoodLoop admin" not in labels

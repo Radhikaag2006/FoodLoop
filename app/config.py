@@ -77,6 +77,12 @@ def demo_allowed(is_prod, requested):
     return bool(requested) and not is_prod
 
 
+DEMO_PASSWORD = "Demo@1234"          # published on purpose: demo data only
+DEMO_LOGINS = [                      # (label, name, sign-in id)
+    ("Business", "Rohit Gupta", "9000000005"),
+    ("Collector", "Imran Khan", "9000000007"),
+    ("FoodLoop admin", "Admin", "admin@foodloop.local"),
+]
 DEMO_REQUESTED = os.getenv("DEMO_MODE", "0") == "1"
 DEMO_MODE = demo_allowed(IS_PROD, DEMO_REQUESTED)
 if DEMO_REQUESTED and not DEMO_MODE:

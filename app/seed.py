@@ -23,7 +23,7 @@ from .tiers import classify
 
 log = logging.getLogger("foodloop")
 
-DEMO_PW = "Demo@1234"
+DEMO_PW = C.DEMO_PASSWORD
 FACILITIES = [
     # name, kind, tiers, lat, lng, cap, certified, rate, cert
     ("Demo Pulp and Pickle Unit", "processor", "B", 28.469, 77.530,
