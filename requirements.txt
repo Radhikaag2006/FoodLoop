@@ -8,3 +8,4 @@ reportlab
 psycopg2-binary
 pytest
 httpx
+ortools==9.15.6755

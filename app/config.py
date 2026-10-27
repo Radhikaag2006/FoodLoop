@@ -76,6 +76,22 @@ ROAD_FACTOR = float(os.getenv("ROAD_FACTOR", "1.3"))
 # Dispatch: each run a collector already holds counts as this many km
 # when picking the nearest one, so work spreads out.
 DISPATCH_LOAD_KM = float(os.getenv("DISPATCH_LOAD_KM", "5"))
+# How runs are given to drivers: "rules" (nearest driver, one run at a time),
+# "solver" (all pending runs together, optimised), or "shadow" (rules decide,
+# the solver's answer is only recorded for comparison).
+DISPATCH_MODE = os.getenv("DISPATCH_MODE", "rules")
+if DISPATCH_MODE not in ("rules", "solver", "shadow"):
+    DISPATCH_MODE = "rules"
+DISPATCH_BATCH_SECONDS = int(os.getenv("DISPATCH_BATCH_SECONDS", "120"))
+SOLVER_TIME_LIMIT_S = float(os.getenv("SOLVER_TIME_LIMIT_S", "5"))
+# Solver cost of leaving a run without a driver (km-equivalent) and of a
+# driver holding many runs (extra km-equivalent per run already held).
+UNASSIGNED_PENALTY_KM = float(os.getenv("UNASSIGNED_PENALTY_KM", "1000"))
+# Optional road distances from an OSRM server, e.g. http://localhost:5000.
+# Empty = straight line x ROAD_FACTOR. Any OSRM error falls back to that.
+OSRM_URL = os.getenv("OSRM_URL", "").strip().rstrip("/")
+OSRM_TIMEOUT_S = float(os.getenv("OSRM_TIMEOUT_S", "3"))
+AVG_SPEED_KMH = float(os.getenv("AVG_SPEED_KMH", "25"))  # for minutes
 
 # Collection rules
 MIN_DROP_KG = float(os.getenv("MIN_DROP_KG", "1.0"))
