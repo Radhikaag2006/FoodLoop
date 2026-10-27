@@ -26,6 +26,17 @@ def _photo(key):
     return ""
 
 
+def _demo_logins():
+    """The demo accounts and their password, sent only when demo mode is on
+    (never in production). The website's own files contain none of it."""
+    if not C.DEMO_MODE:
+        return {"demo_accounts": [], "demo_password": ""}
+    keep_admin = not (C.ADMIN_EMAIL and C.ADMIN_PASSWORD)
+    return {"demo_password": C.DEMO_PASSWORD,
+            "demo_accounts": [list(a) for a in C.DEMO_LOGINS
+                              if keep_admin or a[0] != "FoodLoop admin"]}
+
+
 @router.get("/catalog")
 def catalog():
     items = [{"key": k, "label": v["label"], "dated": v["dated"],
@@ -34,7 +45,11 @@ def catalog():
     return {"items": items, "conditions": CONDITIONS, "tiers": TIERS,
             "routes": TIER_ROUTES,
             "cities": {k: list(v) for k, v in C.CITIES.items()},
-            "demo": C.DEMO_MODE}
+            "demo": C.DEMO_MODE,
+            # the demo admin exists only while no real admin login is set
+            "demo_admin": C.DEMO_MODE and not (
+                C.ADMIN_EMAIL and C.ADMIN_PASSWORD),
+            **_demo_logins()}
 
 
 class ClassifyIn(BaseModel):

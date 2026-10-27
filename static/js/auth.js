@@ -1,9 +1,6 @@
 "use strict";
 /* Onboarding, welcome, sign in, sign up, reset, pending. */
 
-const DEMO_ACCOUNTS = [
-  ["Business", "Rohit Gupta", "9000000005"], ["Collector", "Imran Khan", "9000000007"], ["FoodLoop admin", "Admin", "admin@foodloop.local"],
-];
 
 function pwField(id, label = "Password", hint = "") {
   return `<div class="field"><label for="${id}">${label}</label><div class="pw">
@@ -82,11 +79,11 @@ route("/login", { bare: true, guestOnly: true }, (el) => {
     });
   };
   const d = $("#demo", el);
-  if (d) d.onclick = () => sheet(`<h2>Demo accounts</h2><p class="muted small">Fictional data for trying the app. Password for all: <b>Demo@1234</b></p>
-    <div class="list">${DEMO_ACCOUNTS.map(([r, n, id]) => `<button class="li" data-id="${id}"><div class="avatar">${initials(n)}</div>
+  if (d) d.onclick = () => sheet(`<h2>Demo accounts</h2><p class="muted small">Fictional data for trying the app. Password for all: <b>${esc(S.cat.demo_password)}</b></p>
+    <div class="list">${S.cat.demo_accounts.map(([r, n, id]) => `<button class="li" data-id="${id}"><div class="avatar">${initials(n)}</div>
       <div class="li-main">${r}<span class="sub">${n}</span></div>${icon("chevron-right", 20)}</button>`).join("")}</div>`, (s, close) => {
     $$("[data-id]", s).forEach((b) => b.onclick = () => {
-      $("#id", el).value = b.dataset.id; $("#pw", el).value = "Demo@1234"; close(); $("#f", el).requestSubmit();
+      $("#id", el).value = b.dataset.id; $("#pw", el).value = S.cat.demo_password; close(); $("#f", el).requestSubmit();
     });
   });
 });

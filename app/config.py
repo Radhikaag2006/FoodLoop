@@ -23,7 +23,15 @@ def load_env_file(path=".env"):
 load_env_file()
 
 ENV = os.getenv("ENV", "development")          # development | production
-IS_PROD = ENV == "production"
+
+
+def is_production(env, render_flag=""):
+    """Render sets RENDER=true on every service, so a Render deploy is
+    production even if ENV was never set there."""
+    return env == "production" or str(render_flag).lower() == "true"
+
+
+IS_PROD = is_production(ENV, os.getenv("RENDER", ""))
 DB_URL = os.getenv("DATABASE_URL", "sqlite:///./foodloop.db")
 if DB_URL.startswith("postgres://"):
     DB_URL = DB_URL.replace("postgres://", "postgresql+psycopg2://", 1)
@@ -38,8 +46,15 @@ UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")
 SESSION_DAYS = int(os.getenv("SESSION_DAYS", "30"))
 
 # First platform admin, created at startup if no admin exists.
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
+def _env(name, default=""):
+    """An environment value without stray spaces or line breaks. Hosting
+    dashboards use multi-line boxes, so an invisible newline at the end of a
+    pasted value is easy to add and would make a login impossible."""
+    return os.getenv(name, default).strip()
+
+
+ADMIN_EMAIL = _env("ADMIN_EMAIL")
+ADMIN_PASSWORD = _env("ADMIN_PASSWORD")
 # The admin above is only created when no admin exists yet. Set this to 1
 # for one deploy to make an existing admin use ADMIN_EMAIL / ADMIN_PASSWORD
 # (forgotten password, wrong first setup). Remove it afterwards.
@@ -54,7 +69,26 @@ SMTP_PASS = os.getenv("SMTP_PASS", "")
 SMTP_FROM = os.getenv("SMTP_FROM", "FoodLoop <no-reply@foodloop.local>")
 
 # Demo data (fictional orgs, simulated history). Never enable for real use.
-DEMO_MODE = os.getenv("DEMO_MODE", "0") == "1"
+
+
+def demo_allowed(is_prod, requested):
+    """Demo data and the public demo password must never exist on a real
+    site, so production ignores DEMO_MODE completely."""
+    return bool(requested) and not is_prod
+
+
+DEMO_PASSWORD = "Demo@1234"          # published on purpose: demo data only
+DEMO_LOGINS = [                      # (label, name, sign-in id)
+    ("Business", "Rohit Gupta", "9000000005"),
+    ("Collector", "Imran Khan", "9000000007"),
+    ("FoodLoop admin", "Admin", "admin@foodloop.local"),
+]
+DEMO_REQUESTED = os.getenv("DEMO_MODE", "0") == "1"
+DEMO_MODE = demo_allowed(IS_PROD, DEMO_REQUESTED)
+if DEMO_REQUESTED and not DEMO_MODE:
+    import logging
+    logging.getLogger("foodloop.config").warning(
+        "DEMO_MODE is ignored in production. Remove it from the environment.")
 
 # Billing. Razorpay TEST keys only (rzp_test_...); with no keys the app
 # uses a built-in simulated gateway (development only). Live keys are

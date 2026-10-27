@@ -9,7 +9,7 @@ import logging
 import sys
 from datetime import timedelta, date
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from . import config as C
 from .clock import utcnow
@@ -23,7 +23,7 @@ from .tiers import classify
 
 log = logging.getLogger("foodloop")
 
-DEMO_PW = "Demo@1234"
+DEMO_PW = C.DEMO_PASSWORD
 FACILITIES = [
     # name, kind, tiers, lat, lng, cap, certified, rate, cert
     ("Demo Pulp and Pickle Unit", "processor", "B", 28.469, 77.530,
@@ -50,6 +50,30 @@ def reset():
     Base.metadata.create_all(engine)
 
 
+def _public_password(pw):
+    """True when `pw` is the published demo password on a production site."""
+    return C.IS_PROD and pw == DEMO_PW
+
+
+def disable_demo_accounts(db):
+    """Production only. Demo users (phones 9000000xxx, admin@foodloop.local)
+    that still have the published demo password are an open door, so turn
+    them off. Accounts whose owner changed the password are left alone."""
+    off = 0
+    rows = db.scalars(select(User).where(or_(
+        User.phone.like("9000000%"), User.email == "admin@foodloop.local")))
+    for u in rows:
+        if u.status != "disabled" and check_pw(DEMO_PW, u.pw_hash):
+            u.status = "disabled"
+            u.sv = (u.sv or 1) + 1               # signs out open sessions
+            off += 1
+    if off:
+        db.commit()
+        log.warning("Turned off %d demo account(s) that still had the "
+                    "public demo password.", off)
+    return off
+
+
 def _admin_ready(db, admin, email, pw):
     """What to do when an admin already exists: say which one, and reset it
     when asked. Returns nothing; every outcome is logged so a wrong login
@@ -58,6 +82,10 @@ def _admin_ready(db, admin, email, pw):
         log.info("Admin account: %s", admin.email)
         return
     email = email.lower()
+    if _public_password(pw):
+        log.error("ADMIN_PASSWORD is the public demo password. Choose a "
+                  "different one; the admin was not changed.")
+        return
     same = admin.email == email and check_pw(pw, admin.pw_hash)
     if C.ADMIN_PASSWORD_RESET:
         clash = db.scalar(select(User).where(
@@ -95,6 +123,10 @@ def bootstrap():
                 return
             email, pw = "admin@foodloop.local", DEMO_PW
             log.warning("Dev admin created: %s / %s", email, pw)
+        if _public_password(pw):
+            log.error("ADMIN_PASSWORD is the public demo password. Choose a "
+                      "different one; no admin was created.")
+            return
         db.add(User(name="FoodLoop Admin", email=email.lower(),
                     role="admin", pw_hash=hash_pw(pw)))
         db.commit()
@@ -189,6 +221,8 @@ def init():
     bootstrap()
     db = SessionLocal()
     try:
+        if C.IS_PROD:
+            disable_demo_accounts(db)
         ensure_plans(db)
     finally:
         db.close()
@@ -200,6 +234,8 @@ if __name__ == "__main__":
     if "--reset" in sys.argv:
         reset()
     if "--demo" in sys.argv:
+        if C.IS_PROD:
+            sys.exit("Demo data is never loaded in production.")
         C.DEMO_MODE = True
     init()
     print("Done.")
