@@ -18,7 +18,7 @@ from .matching import plan_pickups
 from .models import CollectorProfile, Org, User, Facility, Lot
 from .records import create_record
 from .billing import ensure_plans
-from .security import hash_pw
+from .security import check_pw, hash_pw
 from .tiers import classify
 
 log = logging.getLogger("foodloop")
@@ -50,12 +50,44 @@ def reset():
     Base.metadata.create_all(engine)
 
 
+def _admin_ready(db, admin, email, pw):
+    """What to do when an admin already exists: say which one, and reset it
+    when asked. Returns nothing; every outcome is logged so a wrong login
+    on a live site can be explained from the logs."""
+    if not (email and pw):
+        log.info("Admin account: %s", admin.email)
+        return
+    email = email.lower()
+    same = admin.email == email and check_pw(pw, admin.pw_hash)
+    if C.ADMIN_PASSWORD_RESET:
+        clash = db.scalar(select(User).where(
+            User.email == email, User.id != admin.id))
+        if clash:
+            log.error("Admin reset skipped: %s belongs to another account.",
+                      email)
+            return
+        admin.email, admin.pw_hash, admin.status = email, hash_pw(pw), "active"
+        admin.sv = (admin.sv or 1) + 1           # signs out old sessions
+        db.commit()
+        log.warning("Admin reset: sign in as %s with ADMIN_PASSWORD. Remove "
+                    "ADMIN_PASSWORD_RESET now.", email)
+    elif same:
+        log.info("Admin account: %s (matches ADMIN_EMAIL / ADMIN_PASSWORD)",
+                 admin.email)
+    else:
+        log.warning("An admin already exists (%s) and does not match "
+                    "ADMIN_EMAIL / ADMIN_PASSWORD, which are only used when "
+                    "there is no admin. Set ADMIN_PASSWORD_RESET=1 for one "
+                    "deploy to reset it.", admin.email)
+
+
 def bootstrap():
     db = SessionLocal()
     try:
-        if db.scalar(select(User).where(User.role == "admin")):
-            return
         email, pw = C.ADMIN_EMAIL, C.ADMIN_PASSWORD
+        admin = db.scalar(select(User).where(User.role == "admin"))
+        if admin:
+            return _admin_ready(db, admin, email, pw)
         if not (email and pw):
             if C.IS_PROD:
                 log.warning("No admin yet. Set ADMIN_EMAIL and "
@@ -66,6 +98,7 @@ def bootstrap():
         db.add(User(name="FoodLoop Admin", email=email.lower(),
                     role="admin", pw_hash=hash_pw(pw)))
         db.commit()
+        log.info("Admin created: %s", email.lower())
     finally:
         db.close()
 
