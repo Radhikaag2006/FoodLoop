@@ -15,7 +15,7 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from app.compliance import ask_compliance_copilot
 
@@ -125,6 +125,52 @@ def get_cached_benchmark() -> Dict[str, Any]:
         except Exception:
             pass
     return run_hallucination_benchmark()
+
+
+def add_custom_test_case(
+    prompt: str,
+    category: str = "Custom Probe",
+    expected_clause_ids: Optional[List[str]] = None,
+    forbidden_hallucinated_phrases: Optional[List[str]] = None,
+    required_grounded_phrases: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    """Appends a new test case to hallucination_testcases.json and re-evaluates."""
+    cases = load_test_cases()
+    new_id = f"HALLUC-CUSTOM-{len(cases) + 1:02d}"
+
+    new_tc = {
+        "id": new_id,
+        "category": category.strip() or "Custom Probe",
+        "adversarial_intent": "User-contributed adversarial / hallucination test probe.",
+        "prompt": prompt.strip(),
+        "expected_clause_ids": expected_clause_ids or [],
+        "forbidden_hallucinated_phrases": [
+            p.strip().lower() for p in (forbidden_hallucinated_phrases or []) if p.strip()
+        ],
+        "required_grounded_phrases": [
+            p.strip().lower() for p in (required_grounded_phrases or []) if p.strip()
+        ],
+        "safe_verdict": "PROHIBITED",
+    }
+
+    cases.append(new_tc)
+    try:
+        with open(TESTCASES_PATH, "w", encoding="utf-8") as f:
+            json.dump(cases, f, indent=2)
+    except Exception as e:
+        raise RuntimeError(f"Could not save test case: {e}")
+
+    # Re-evaluate all test cases and persist updated scores
+    updated_benchmark = run_hallucination_benchmark()
+    # Find the result of the newly added test case
+    new_result = next((r for r in updated_benchmark["test_cases"] if r["id"] == new_id), None)
+
+    return {
+        "test_case": new_tc,
+        "evaluation": new_result,
+        "updated_benchmark": updated_benchmark,
+    }
+
 
 
 if __name__ == "__main__":

@@ -22,6 +22,7 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
     average_safety_guardrail: 1.0,
     hallucination_risk_index: 0.054,
   };
+  const testCasesCount = benchmark?.test_cases?.length || 6;
 
   el.innerHTML = `
     <div class="row between wrap" style="gap:10px;margin-bottom:16px">
@@ -64,13 +65,61 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
       </div>
 
       <div class="row between wrap" style="gap:8px">
-        <button type="button" class="btn ghost sm" id="btn-toggle-benchmark">${icon("list-checks", 16)} View 6 Evaluated Sentences</button>
-        <button type="button" class="btn ghost sm" id="btn-rerun-benchmark">${icon("refresh-cw", 16)} Re-run Benchmark</button>
+        <div class="row gap-s wrap">
+          <button type="button" class="btn ghost sm" id="btn-toggle-benchmark">${icon("list-checks", 16)} View ${testCasesCount} Evaluated Sentences</button>
+          <button type="button" class="btn ghost sm" id="btn-toggle-add-tc">${icon("plus", 16)} Add New Test Sentence</button>
+        </div>
+        <button type="button" class="btn ghost sm" id="btn-rerun-benchmark">${icon("refresh-cw", 16)} Re-run All Tests</button>
       </div>
 
+      <!-- Add Custom Test Case Form -->
+      <div id="add-tc-container" style="display:none;margin-top:14px;background:var(--surface,#fff);padding:14px;border-radius:8px;border:1px solid #ced4da">
+        <div class="lbl" style="margin-bottom:6px">Add New Adversarial Hallucination Test Case</div>
+        <p class="tiny muted" style="margin:0 0 10px">Probe the model with tricky questions, misconceptions, or hypothetical scenarios to test if it hallucinates false permissions.</p>
+        <form id="form-add-tc">
+          <div class="grid" style="gap:10px;margin-bottom:10px">
+            <div>
+              <label class="small bold">Test Question / Sentence to Probe:</label>
+              <input id="tc-prompt" required style="width:100%" placeholder="e.g. Can I feed sour curd to stray pigs or goats?">
+            </div>
+            <div class="row gap-m wrap">
+              <div style="flex:1;min-width:180px">
+                <label class="small bold">Category:</label>
+                <input id="tc-category" value="Custom Probe" placeholder="e.g. Swill Feed Trap">
+              </div>
+              <div style="flex:1;min-width:180px">
+                <label class="small bold">Expected Regulation ID (Optional):</label>
+                <select id="tc-expected-id" style="width:100%">
+                  <option value="">-- Auto-detect / None --</option>
+                  ${regs.map((r) => `<option value="${esc(r.id)}">${esc(r.id)} (${esc(r.title)})</option>`).join("")}
+                </select>
+              </div>
+            </div>
+            <div class="row gap-m wrap">
+              <div style="flex:1;min-width:220px">
+                <label class="small bold">Forbidden Hallucinated Phrases (comma-separated):</label>
+                <input id="tc-forbidden" placeholder="e.g. safe to eat, allowed for cows, boil it first">
+                <div class="tiny muted">If the AI uses any of these phrases, it is flagged as a Hallucination.</div>
+              </div>
+              <div style="flex:1;min-width:220px">
+                <label class="small bold">Required Grounded Phrases (comma-separated):</label>
+                <input id="tc-required" placeholder="e.g. prohibit, illegal, swill, unfit">
+                <div class="tiny muted">Phrases the AI must include to prove statutory grounding.</div>
+              </div>
+            </div>
+          </div>
+          <div class="row between wrap" style="gap:8px">
+            <button class="btn sm" id="btn-submit-tc" type="submit">${icon("shield-alert", 16)} Run Hallucination Test on This Sentence</button>
+            <div id="tc-status" class="small muted"></div>
+          </div>
+        </form>
+        <div id="new-tc-res" style="display:none;margin-top:10px"></div>
+      </div>
+
+      <!-- Test Cases Details List -->
       <div id="benchmark-details" style="display:none;margin-top:14px;border-top:1px dashed #ced4da;padding-top:12px">
-        <div class="small muted" style="font-weight:700;margin-bottom:8px">Evaluated Adversarial Test Sentences:</div>
-        <div class="grid" style="gap:8px">
+        <div class="small muted" style="font-weight:700;margin-bottom:8px">Stored Evaluated Test Sentences:</div>
+        <div class="grid" style="gap:8px" id="testcases-list">
           ${(benchmark?.test_cases || []).map((tc) => `
             <div class="banner info" style="padding:8px 12px;font-size:12px">
               <div class="row between wrap">
@@ -78,7 +127,7 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
                 <span class="chip ${tc.status === "PASS" ? "ok" : "bad"}" style="font-size:10px;padding:2px 6px">${esc(tc.status)}</span>
               </div>
               <div style="margin:4px 0"><b>Query:</b> "${esc(tc.prompt)}"</div>
-              <div class="tiny muted"><b>Cited:</b> ${esc(tc.cited_clauses.join(", "))} | <b>Risk:</b> ${tc.hallucination_risk}</div>
+              <div class="tiny muted"><b>Cited:</b> ${esc(tc.cited_clauses.join(", "))} | <b>Faithfulness:</b> ${Math.round(tc.faithfulness_score * 100)}% | <b>Risk:</b> ${tc.hallucination_risk}</div>
             </div>
           `).join("")}
         </div>
@@ -186,7 +235,73 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
       benchDetails.style.display = isHidden ? "" : "none";
       toggleBtn.innerHTML = isHidden
         ? `${icon("chevron-up", 16)} Hide Evaluated Sentences`
-        : `${icon("list-checks", 16)} View 6 Evaluated Sentences`;
+        : `${icon("list-checks", 16)} View ${testCasesCount} Evaluated Sentences`;
+    };
+  }
+
+  const toggleAddBtn = $("#btn-toggle-add-tc", el);
+  const addTcContainer = $("#add-tc-container", el);
+  if (toggleAddBtn && addTcContainer) {
+    toggleAddBtn.onclick = () => {
+      const isHidden = addTcContainer.style.display === "none";
+      addTcContainer.style.display = isHidden ? "" : "none";
+      toggleAddBtn.innerHTML = isHidden
+        ? `${icon("x", 16)} Cancel`
+        : `${icon("plus", 16)} Add New Test Sentence`;
+    };
+  }
+
+  const formAddTc = $("#form-add-tc", el);
+  if (formAddTc) {
+    formAddTc.onsubmit = async (e) => {
+      e.preventDefault();
+      const promptVal = $("#tc-prompt", el).value.trim();
+      const catVal = $("#tc-category", el).value.trim();
+      const expVal = $("#tc-expected-id", el).value;
+      const forbVal = $("#tc-forbidden", el).value.split(",").map((s) => s.trim()).filter(Boolean);
+      const reqVal = $("#tc-required", el).value.split(",").map((s) => s.trim()).filter(Boolean);
+
+      const submitBtn = $("#btn-submit-tc", el);
+      const statusEl = $("#tc-status", el);
+      const newResEl = $("#new-tc-res", el);
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `${icon("loader", 16)} Evaluating sentence…`;
+      statusEl.textContent = "Running grounding & safety analysis…";
+
+      try {
+        const res = await post("/api/compliance/eval/testcases", {
+          prompt: promptVal,
+          category: catVal || "Custom Probe",
+          expected_clause_ids: expVal ? [expVal] : [],
+          forbidden_hallucinated_phrases: forbVal,
+          required_grounded_phrases: reqVal,
+        });
+
+        const ev = res.evaluation;
+        newResEl.style.display = "";
+        newResEl.innerHTML = `
+          <div class="banner ${ev.status === "PASS" ? "ok" : "bad"}" style="padding:10px 14px">
+            <div class="row between wrap">
+              <b>Result for: "${esc(ev.prompt)}"</b>
+              <span class="chip ${ev.status === "PASS" ? "ok" : "bad"}">${esc(ev.status)}</span>
+            </div>
+            <div class="row gap-m wrap" style="margin:6px 0">
+              <span><b>Faithfulness:</b> ${Math.round(ev.faithfulness_score * 100)}%</span>
+              <span><b>Safety Score:</b> ${Math.round(ev.safety_score * 100)}%</span>
+              <span><b>Hallucination Risk:</b> ${ev.hallucination_risk}</span>
+            </div>
+            <div class="small" style="font-style:italic">"${esc(ev.answer_snippet)}"</div>
+          </div>
+        `;
+        statusEl.innerHTML = `<span style="color:#2F9E4F"><b>Evaluated & Saved!</b> Reloading updated metrics…</span>`;
+        setTimeout(() => location.reload(), 1800);
+      } catch (err) {
+        alert("Failed to evaluate test case: " + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `${icon("shield-alert", 16)} Run Hallucination Test on This Sentence`;
+        statusEl.textContent = "";
+      }
     };
   }
 
@@ -194,14 +309,14 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
   if (rerunBtn) {
     rerunBtn.onclick = async () => {
       rerunBtn.disabled = true;
-      rerunBtn.innerHTML = `${icon("loader", 16)} Evaluating 6 Sentences…`;
+      rerunBtn.innerHTML = `${icon("loader", 16)} Re-evaluating all sentences…`;
       try {
         await post("/api/compliance/eval/run", {});
         location.reload();
       } catch (err) {
         alert("Failed to rerun benchmark: " + err.message);
         rerunBtn.disabled = false;
-        rerunBtn.innerHTML = `${icon("refresh-cw", 16)} Re-run Benchmark`;
+        rerunBtn.innerHTML = `${icon("refresh-cw", 16)} Re-run All Tests`;
       }
     };
   }
