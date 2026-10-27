@@ -8,6 +8,10 @@ os.environ["DATABASE_URL"] = f"sqlite:///{_d}/t.db"
 os.environ["UPLOAD_DIR"] = f"{_d}/up"
 os.environ["DEMO_MODE"] = "1"
 os.environ["ENV"] = "development"
+# a developer's own .env must not change what the tests see
+for _k in ("RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "FREE_PICKUPS",
+           "ALLOW_LIVE_PAYMENTS"):
+    os.environ[_k] = {"FREE_PICKUPS": "3"}.get(_k, "")
 os.chdir(os.path.dirname(os.path.dirname(__file__)))
 
 from fastapi.testclient import TestClient  # noqa: E402

@@ -15,8 +15,9 @@ from . import config as C
 from .clock import utcnow
 from .db import Base, engine, SessionLocal
 from .matching import plan_pickups
-from .models import Org, User, Facility, Lot
+from .models import CollectorProfile, Org, User, Facility, Lot
 from .records import create_record
+from .billing import ensure_plans
 from .security import hash_pw
 from .tiers import classify
 
@@ -25,10 +26,6 @@ log = logging.getLogger("foodloop")
 DEMO_PW = "Demo@1234"
 FACILITIES = [
     # name, kind, tiers, lat, lng, cap, certified, rate, cert
-    ("Demo Rescue Kitchen (NGO)", "ngo", "A", 28.480, 77.495,
-     200, False, 0.0, ""),
-    ("Demo Community Kitchen, Noida", "ngo", "A", 28.570, 77.320,
-     150, False, 0.0, ""),
     ("Demo Pulp and Pickle Unit", "processor", "B", 28.469, 77.530,
      500, False, 4.0, ""),
     ("Demo Pulp Unit 2, Noida", "processor", "B", 28.620, 77.380,
@@ -105,14 +102,17 @@ def seed_demo():
                             address="Demo address", phone=""))
         _user(db, "Rohit Gupta", "9000000005", "business", dist)
         _user(db, "Neha Singh", "9000000006", "business", mfg)
-        _user(db, "Imran Khan", "9000000007", "hub")
+        imran = _user(db, "Imran Khan", "9000000007", "hub")
+        db.add(CollectorProfile(
+            user_id=imran.id, vehicle="Tata Ace (demo)", capacity_kg=500,
+            base_lat=28.474, base_lng=77.504, base_label="Greater Noida"))
 
         today = date.today()
         for org, item, cond, kg, days in (
-                (dist, "biscuits", "fresh", 40, -20),
+                (dist, "snacks", "fresh", 40, -20),
                 (dist, "dairy", "fresh", 25, -3),
-                (dist, "bread", "fresh", 15, -5),
-                (mfg, "ready_pack", "fresh", 30, -10)):
+                (dist, "bakery", "fresh", 15, -5),
+                (mfg, "cooked", "fresh", 30, -10)):
             exp = today + timedelta(days=days)
             t = classify(item, cond, expiry=exp)
             db.add(Lot(org_id=org.id, item=item, condition=cond,
@@ -135,9 +135,30 @@ def seed_demo():
         db.close()
 
 
+def ensure_columns():
+    """create_all adds tables but never columns: add the ones we grew."""
+    from sqlalchemy import inspect, text
+    have = {c["name"] for c in inspect(engine).get_columns("invoices")}
+    if "breakdown" not in have:
+        with engine.begin() as cx:
+            cx.execute(text(
+                "ALTER TABLE invoices ADD COLUMN breakdown TEXT DEFAULT '[]'"))
+    have = {c["name"] for c in inspect(engine).get_columns("run_assignments")}
+    if "accepted_at" not in have:
+        with engine.begin() as cx:
+            cx.execute(text(
+                "ALTER TABLE run_assignments ADD COLUMN accepted_at DATETIME"))
+
+
 def init():
     Base.metadata.create_all(engine)
+    ensure_columns()
     bootstrap()
+    db = SessionLocal()
+    try:
+        ensure_plans(db)
+    finally:
+        db.close()
     if C.DEMO_MODE:
         seed_demo()
 

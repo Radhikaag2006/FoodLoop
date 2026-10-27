@@ -122,7 +122,7 @@ route("/legal", { title: "Terms and privacy", back: true }, (el) => {
 const COND_LABEL = { fresh: "Fresh", overripe: "Overripe", bruised: "Bruised", spoiled: "Spoiled" };
 function tilesHTML(items, sel) {
   return `<div class="tiles" role="radiogroup">${items.map((i) => `<button type="button" class="tile ${i.key === sel ? "on" : ""}"
-    data-k="${i.key}" role="radio" aria-checked="${i.key === sel}"><span class="ti">${itemVis(i.key, 38)}</span>${esc(i.label)}</button>`).join("")}</div>`;
+    data-k="${i.key}" role="radio" aria-checked="${i.key === sel}"><span class="ti">${itemVis(i.key, 64)}</span>${esc(i.label)}</button>`).join("")}</div>`;
 }
 function segHTML(id, opts, sel) {
   return `<div class="seg" id="${id}">${opts.map(([k, t]) => `<button type="button" data-k="${k}" class="${k === sel ? "on" : ""}">${t}</button>`).join("")}</div>`;

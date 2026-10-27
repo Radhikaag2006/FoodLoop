@@ -8,7 +8,9 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from . import config as C
-from .routes import admin, auth, business, common, hub
+from . import payments
+from .routes import (admin, auth, billing, business, common,
+                     facility_docs, hub, tracking)
 from .seed import init
 
 logging.basicConfig(level=logging.INFO)
@@ -23,12 +25,21 @@ async def lifespan(app):
 app = FastAPI(title="FoodLoop", lifespan=lifespan, docs_url=None,
               redoc_url=None, openapi_url=None)
 
+# Razorpay Checkout needs its own script, frame and API hosts; they are
+# only allowed when Razorpay is actually configured.
+_RZP = payments.mode() == "razorpay"
 CSP = ("default-src 'self'; img-src 'self' data: blob: "
-       "https://*.tile.openstreetmap.org https://tile.openstreetmap.org; "
-       "style-src 'self' 'unsafe-inline'; script-src 'self'; "
-       "font-src 'self'; connect-src 'self'; media-src 'self' blob:; "
+       "https://*.tile.openstreetmap.org https://tile.openstreetmap.org"
+       + (" https://*.razorpay.com" if _RZP else "") + "; "
+       "style-src 'self' 'unsafe-inline'; script-src 'self'"
+       + (" https://checkout.razorpay.com" if _RZP else "") + "; "
+       "font-src 'self'; connect-src 'self'"
+       + (" https://api.razorpay.com https://lumberjack.razorpay.com"
+          if _RZP else "") + "; media-src 'self' blob:; "
        "worker-src 'self'; manifest-src 'self'; frame-ancestors 'none'; "
-       "base-uri 'self'; form-action 'self'")
+       + ("frame-src https://api.razorpay.com https://checkout.razorpay.com; "
+          if _RZP else "")
+       + "base-uri 'self'; form-action 'self'")
 
 
 @app.middleware("http")
@@ -70,7 +81,8 @@ async def bad_input(request, exc):
             "Field required", "this is required")}, status_code=422)
 
 
-for r in (auth, common, business, hub, admin):
+for r in (auth, common, business, hub, admin, billing, facility_docs,
+          tracking):
     app.include_router(r.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -95,6 +107,7 @@ def manifest():
 
 @app.get("/", include_in_schema=False)
 @app.get("/verify/{code}", include_in_schema=False)
+@app.get("/track/{code}", include_in_schema=False)
 def shell(code: str = ""):
     return FileResponse("templates/app.html", media_type="text/html",
                         headers={"Cache-Control": "no-cache"})

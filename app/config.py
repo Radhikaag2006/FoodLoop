@@ -3,6 +3,25 @@ Values marked ASSUMPTION are placeholders: replace them with sourced
 numbers before quoting them anywhere."""
 import os
 
+
+def load_env_file(path=".env"):
+    """Read KEY=VALUE lines from a .env file (git-ignored) into the
+    environment. Real environment variables always win."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
+    except OSError:
+        return
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, val = line.split("=", 1)
+        os.environ.setdefault(key.strip(), val.strip().strip("\"'"))
+
+
+load_env_file()
+
 ENV = os.getenv("ENV", "development")          # development | production
 IS_PROD = ENV == "production"
 DB_URL = os.getenv("DATABASE_URL", "sqlite:///./foodloop.db")
@@ -33,9 +52,36 @@ SMTP_FROM = os.getenv("SMTP_FROM", "FoodLoop <no-reply@foodloop.local>")
 # Demo data (fictional orgs, simulated history). Never enable for real use.
 DEMO_MODE = os.getenv("DEMO_MODE", "0") == "1"
 
+# Billing. Razorpay TEST keys only (rzp_test_...); with no keys the app
+# uses a built-in simulated gateway (development only). Live keys are
+# refused unless ALLOW_LIVE_PAYMENTS=1, so nobody is billed by accident.
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "").strip()
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "").strip()
+ALLOW_LIVE_PAYMENTS = os.getenv("ALLOW_LIVE_PAYMENTS", "0") == "1"
+# UPI QR for ride bills: money is paid straight to this UPI ID, so it must
+# be YOUR account. Leave it empty to get a harmless demo QR (development only).
+UPI_VPA = os.getenv("UPI_VPA", "").strip()
+UPI_NAME = os.getenv("UPI_PAYEE_NAME", "FoodLoop").strip() or "FoodLoop"
+FREE_PICKUPS = int(os.getenv("FREE_PICKUPS", "3"))   # trial per business
+PLAN_DAYS = 30                                       # monthly plan length
+
+# Driver fare for one run (paise). ASSUMPTION: placeholders, tune after a
+# pilot with real drivers. fare = base + per km (road) + per extra stop
+# + per kg handled. Straight-line km are scaled by ROAD_FACTOR.
+DRIVER_BASE_PAISE = int(os.getenv("DRIVER_BASE_PAISE", "15000"))      # Rs 150
+DRIVER_PER_KM_PAISE = int(os.getenv("DRIVER_PER_KM_PAISE", "1400"))   # Rs 14
+DRIVER_PER_STOP_PAISE = int(os.getenv("DRIVER_PER_STOP_PAISE", "2500"))
+DRIVER_PER_KG_PAISE = int(os.getenv("DRIVER_PER_KG_PAISE", "50"))
+ROAD_FACTOR = float(os.getenv("ROAD_FACTOR", "1.3"))
+# Dispatch: each run a collector already holds counts as this many km
+# when picking the nearest one, so work spreads out.
+DISPATCH_LOAD_KM = float(os.getenv("DISPATCH_LOAD_KM", "5"))
+
 # Collection rules
 MIN_DROP_KG = float(os.getenv("MIN_DROP_KG", "1.0"))
 MIN_PICKUP_KG = float(os.getenv("MIN_PICKUP_KG", "10.0"))
+# A small group rides along with a bigger run if a stop is this close (km)
+CLUB_MAX_KM = float(os.getenv("CLUB_MAX_KM", "30"))
 HUB_TOLERANCE = 0.05       # allowed weight mismatch at the hub (5%)
 VOID_MINUTES = 10          # guard can undo a drop within this window
 QR_MAX_AGE = 300           # seconds a resident QR stays valid

@@ -16,6 +16,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
+
+from .tiers import tier_letter
 from sqlalchemy import select
 
 from .models import Record, Pickup, PickupLine, Facility, Org
@@ -115,7 +117,7 @@ def record_pdf(rec, base_url):
     y -= 6 * mm
     for ln in d["lines"][:28]:
         txt = (f'{ln["source"]}  |  {ln["kind"]} #{ln["ref"]}  |  '
-               f'tier {ln["tier"]}  |  {ln["kg"]} kg')
+               f'tier {tier_letter(ln["tier"])}  |  {ln["kg"]} kg')
         c.drawString(18 * mm, y, txt)
         y -= 5 * mm
         if y < 60 * mm:

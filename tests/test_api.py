@@ -43,9 +43,14 @@ def test_business_signup_and_add_lot(anon):
     r = anon.post("/api/auth/signup", json=body)
     assert r.status_code == 200 and r.json()["org"]["kind"] == "business"
     r = anon.post("/api/business/lots", json={
-        "item": "bread", "condition": "fresh", "qty_kg": 12,
+        "item": "bakery", "condition": "spoiled", "qty_kg": 12,
         "expiry": "2030-01-01"})
     assert r.status_code == 200 and r.json()["lot"]["qty_kg"] == 12
+    # good, in-date food is not waste, so it is refused
+    r = anon.post("/api/business/lots", json={
+        "item": "bakery", "condition": "fresh", "qty_kg": 12,
+        "expiry": "2030-01-01"})
+    assert r.status_code == 422 and "isn't waste" in r.json()["detail"]
     login(anon, ADMIN)
     pend = anon.get("/api/admin/orgs?status=pending").json()
     assert any(o["name"] == "Fresh Foods" for o in pend)
@@ -70,8 +75,12 @@ def test_business_and_unverified_gate(anon):
         "item": "dairy", "condition": "fresh", "qty_kg": 20,
         "expiry": "2020-01-01"})
     j = r.json()
-    assert j["tier"] == "D" and j["locked"] == ["A", "B", "C"]
-    assert j["matches"] and all(m["certified"] for m in j["matches"])
+    assert j["tier"] == "D" and j["locked"] == ["B", "C"]
+    assert "matches" not in j                 # only the single best plant
+    m = j["match"]
+    assert m["certified"] and m["name"] and m["lat"] and m["distance_km"]
+    # a business never sees prices, fees or scores
+    assert not {"rate_per_kg", "est_value", "score"} & set(m)
     assert anon.post("/api/business/lots", json={
         "item": "dairy", "qty_kg": 5}).status_code == 422
     # hub should not plan unverified org lots
@@ -106,11 +115,11 @@ def test_full_pickup_chain_and_report(anon):
 def test_lot_and_pickup_details(anon):
     login(anon, BIZ)
     anon.post("/api/business/lots", json={
-        "item": "tomato", "condition": "overripe", "qty_kg": 3})
+        "item": "vegetables", "condition": "overripe", "qty_kg": 3})
     lots = anon.get("/api/business/lots").json()
     waiting = next(x for x in lots if x["status"] == "waiting")
     d = anon.get(f"/api/business/lots/{waiting['id']}").json()
-    assert d["reason"] and d["route"] and "matches" in d
+    assert d["reason"] and d["route"] and "match" in d and "matches" not in d
     planned = next(x for x in lots if x["status"] == "planned")
     d = anon.get(f"/api/business/lots/{planned['id']}").json()
     p = d["pickup"]

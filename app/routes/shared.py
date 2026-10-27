@@ -2,8 +2,40 @@ import json
 
 from sqlalchemy import select
 
+from datetime import timedelta
+
 from ..clock import iso
-from ..models import Facility, Org, Record
+from ..models import (Facility, FacilityDoc, Org, PickupSchedule, Record,
+                      RunAssignment, User)
+
+WINDOW = timedelta(hours=2)
+
+
+def schedule_dict(db, pickup_id):
+    """Who will collect a pickup and when. starts/ends are None until the
+    collector confirms a time; None overall while nobody has the run."""
+    s = db.scalar(select(PickupSchedule).where(
+        PickupSchedule.pickup_id == pickup_id))
+    a = db.scalar(select(RunAssignment).where(
+        RunAssignment.pickup_id == pickup_id))
+    cid = (a.collector_id if a and a.collector_id else None) or (
+        s.collector_id if s else None)
+    if not cid:
+        return None
+    c = db.get(User, cid)
+    return {"starts": iso(s.starts_at) if s else None,
+            "ends": iso(s.starts_at + WINDOW) if s else None,
+            "collector": {"name": c.name, "phone": c.phone or ""}}
+
+
+def facility_card(db, f, distance_km=None):
+    """What a business may see about a plant. No prices or fees."""
+    return {"id": f.id, "name": f.name, "kind": f.kind,
+            "address": f.address, "lat": f.lat, "lng": f.lng,
+            "certified": f.certified, "cert_no": f.cert_no,
+            "has_document": bool(db.scalar(select(FacilityDoc.id).where(
+                FacilityDoc.facility_id == f.id))),
+            "distance_km": distance_km}
 
 
 def pickup_dict(db, p):
@@ -19,6 +51,7 @@ def pickup_dict(db, p):
         "fac_lat": fac.lat, "fac_lng": fac.lng,
         "record": rec.code if rec else "",
         "created_at": iso(p.created_at), "closed_at": iso(p.closed_at),
+        "schedule": schedule_dict(db, p.id),
     }
 
 

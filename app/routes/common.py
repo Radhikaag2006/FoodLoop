@@ -1,4 +1,5 @@
 import json
+import os
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import Response
@@ -16,10 +17,20 @@ from ..tiers import (CATALOG, CONDITIONS, TIERS, TIER_ROUTES, classify)
 router = APIRouter(prefix="/api")
 
 
+def _photo(key):
+    """URL of a photo for a category, if someone added one."""
+    for ext in ("webp", "jpg", "jpeg", "png"):
+        if os.path.isfile(os.path.join("static", "img", "items",
+                                       f"{key}.{ext}")):
+            return f"/static/img/items/{key}.{ext}"
+    return ""
+
+
 @router.get("/catalog")
 def catalog():
     items = [{"key": k, "label": v["label"], "dated": v["dated"],
-              "fixed": v.get("fixed", "")} for k, v in CATALOG.items()]
+              "fixed": v.get("fixed", ""), "image": _photo(k)}
+             for k, v in CATALOG.items()]
     return {"items": items, "conditions": CONDITIONS, "tiers": TIERS,
             "routes": TIER_ROUTES,
             "cities": {k: list(v) for k, v in C.CITIES.items()},

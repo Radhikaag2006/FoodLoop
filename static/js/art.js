@@ -82,6 +82,73 @@ const VEG = {
     <path d="M50 32V20" stroke="#6B8E23" stroke-width="7" stroke-linecap="round"/>`,
 };
 
+
+/* Category pictures for the "Add a lot" screen (original SVG, same style as above). */
+const wheatEar = (x, rot) => `<g transform="translate(${x} 0) rotate(${rot} 50 92)">
+  <path d="M50 92V34" stroke="#B8862B" stroke-width="3" stroke-linecap="round"/>
+  ${[0, 1, 2, 3, 4].map((i) => `<ellipse cx="43" cy="${38 + i * 9}" rx="4.2" ry="7" fill="#E9B94A" transform="rotate(-24 43 ${38 + i * 9})"/>
+  <ellipse cx="57" cy="${38 + i * 9}" rx="4.2" ry="7" fill="#F4C85C" transform="rotate(24 57 ${38 + i * 9})"/>`).join("")}
+  <ellipse cx="50" cy="26" rx="4" ry="8" fill="#E9B94A"/></g>`;
+Object.assign(VEG, {
+  cat_vegetables: `
+    <g transform="translate(20 2) scale(.8)">${VEG.carrot}</g>
+    <g transform="translate(-8 8) scale(.84)">${VEG.broccoli}</g>
+    <g transform="translate(48 52) scale(.42)">${VEG.tomato}</g>`,
+  cat_fruits: `
+    <circle cx="70" cy="62" r="21" fill="#F28C28"/><ellipse cx="62" cy="54" rx="6" ry="4" fill="#fff" opacity=".3" transform="rotate(-30 62 54)"/>
+    <path d="M70 41C72 36 78 34 82 36C80 41 75 43 70 41Z" fill="#2F9E4F"/>
+    <path d="M36 40C22 36 12 48 14 62C16 78 30 88 40 84C48 88 62 82 62 64C62 48 50 36 36 40Z" fill="#E8472F"/>
+    <path d="M18 64C22 78 34 84 40 80C30 78 22 72 18 64Z" fill="#B8301D" opacity=".3"/>
+    <ellipse cx="26" cy="52" rx="5" ry="3.4" fill="#fff" opacity=".35" transform="rotate(-35 26 52)"/>
+    <path d="M38 42V28" stroke="#6B4423" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M38 32C44 22 54 22 58 26C54 34 44 36 38 32Z" fill="#2F9E4F"/>`,
+  cat_dairy: `
+    <path d="M52 52L90 60V86H52Z" fill="#F4C85C"/><path d="M52 52L90 60L72 46Z" fill="#FADB86"/>
+    <circle cx="66" cy="70" r="3.4" fill="#D9A22B"/><circle cx="80" cy="76" r="2.6" fill="#D9A22B"/><circle cx="72" cy="80" r="2" fill="#D9A22B"/>
+    <rect x="30" y="12" width="22" height="9" rx="3" fill="#4A90D9"/>
+    <path d="M32 21H50V32C62 38 66 46 66 58V84C66 90 62 94 56 94H26C20 94 16 90 16 84V58C16 46 20 38 32 32Z" fill="#fff" stroke="#C9D8E8" stroke-width="2.4"/>
+    <rect x="16" y="52" width="50" height="28" fill="#4A90D9"/><path d="M28 66C32 60 38 60 42 66C46 72 52 72 56 66" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M24 36C20 42 20 50 22 54" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/>`,
+  cat_bakery: `
+    <path d="M10 56C10 36 32 26 50 26C68 26 90 36 90 56V78C90 83 86 86 82 86H18C14 86 10 83 10 78Z" fill="#D9963F"/>
+    <path d="M10 56C10 36 32 26 50 26C68 26 90 36 90 56C74 46 26 46 10 56Z" fill="#EDB765"/>
+    <path d="M32 40L40 54M50 36V52M68 40L60 54" stroke="#B87722" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M12 74C14 80 18 82 24 82H80C84 82 88 80 90 74" fill="none" stroke="#B87722" stroke-width="2.4" opacity=".35"/>
+    <ellipse cx="26" cy="46" rx="6" ry="3" fill="#fff" opacity=".28" transform="rotate(-30 26 46)"/>`,
+  cat_grains: `
+    <path d="M24 66H76L82 92H18Z" fill="#E0B070"/><path d="M24 66H76L74 72H26Z" fill="#C98F4E"/>
+    <path d="M40 66C40 58 60 58 60 66" fill="#B8762F"/>
+    ${wheatEar(-12, -14)}${wheatEar(12, 10)}${wheatEar(0, -2)}
+    <path d="M30 80H70" stroke="#B8762F" stroke-width="2.4" stroke-linecap="round" opacity=".5"/>`,
+  cat_snacks: `
+    <path d="M10 22L40 16L52 76L22 82Z" fill="#E8472F" transform="rotate(-6 30 50)"/>
+    <path d="M10 22L40 16L42 28L12 34Z" fill="#B8301D" transform="rotate(-6 30 50)"/>
+    <ellipse cx="30" cy="54" rx="11" ry="9" fill="#F4B93A" transform="rotate(-6 30 54)"/>
+    <circle cx="62" cy="62" r="25" fill="#D9A25B"/><circle cx="62" cy="62" r="25" fill="none" stroke="#B8762F" stroke-width="2.4" opacity=".5"/>
+    <circle cx="54" cy="52" r="3.6" fill="#6B4423"/><circle cx="70" cy="56" r="3.2" fill="#6B4423"/><circle cx="60" cy="68" r="3.6" fill="#6B4423"/>
+    <circle cx="74" cy="72" r="3" fill="#6B4423"/><circle cx="48" cy="66" r="2.6" fill="#6B4423"/>
+    <ellipse cx="52" cy="46" rx="8" ry="4" fill="#fff" opacity=".25" transform="rotate(-35 52 46)"/>`,
+  cat_cooked: `
+    <path d="M36 28C30 22 40 16 34 8M52 30C46 22 56 16 50 6M68 28C62 22 72 16 66 8" fill="none" stroke="#9FB0A6" stroke-width="3.4" stroke-linecap="round" opacity=".7"/>
+    <ellipse cx="50" cy="52" rx="38" ry="12" fill="#F4B93A"/>
+    <circle cx="36" cy="49" r="4.4" fill="#2F9E4F"/><circle cx="52" cy="46" r="4" fill="#E8472F"/><circle cx="66" cy="50" r="4.4" fill="#2F9E4F"/><circle cx="46" cy="55" r="3.4" fill="#fff" opacity=".7"/>
+    <path d="M12 52C12 76 28 90 50 90C72 90 88 76 88 52C80 62 20 62 12 52Z" fill="#5B2A6B"/>
+    <path d="M16 62C22 70 34 74 50 74" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".25"/>
+    <rect x="38" y="88" width="24" height="5" rx="2.5" fill="#43204F"/>`,
+  cat_kitchen_waste: `
+    <path d="M22 40H78L72 90C72 93 70 94 67 94H33C30 94 28 93 28 90Z" fill="#5B6B62"/>
+    <rect x="18" y="30" width="64" height="12" rx="5" fill="#74857B"/><rect x="42" y="22" width="16" height="8" rx="3" fill="#5B6B62"/>
+    <path d="M36 52V82M50 52V82M64 52V82" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".25"/>
+    <path d="M58 24C60 12 72 6 82 10C80 20 70 26 58 24Z" fill="#2F9E4F"/><path d="M30 26C26 18 32 10 40 8C42 16 38 22 30 26Z" fill="#E8472F"/>`,
+  cat_packaging: `
+    <path d="M12 34L50 22L88 34V76L50 90L12 76Z" fill="#C98F4E"/>
+    <path d="M12 34L50 46L88 34L50 22Z" fill="#DDA867"/><path d="M50 46V90L12 76V34Z" fill="#B8793A"/>
+    <path d="M38 27L66 38V50L58 46V40L30 30Z" fill="#F0DDB4"/>
+    <path d="M60 64C60 58 68 56 72 60M76 66C78 72 72 78 66 76M68 82C62 84 56 80 56 74" fill="none" stroke="#2F9E4F" stroke-width="3.4" stroke-linecap="round" opacity="0"/>
+    <g fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" opacity=".85" transform="translate(58 58) scale(.55)">
+      <path d="M10 6L22 2L26 14"/><path d="M26 24L16 30L6 24"/><path d="M2 14L2 4"/></g>`,
+});
+
 function veg(name, size = 64, extra = "") {
   return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" aria-hidden="true" ${extra}>${VEG[name]}</svg>`;
 }

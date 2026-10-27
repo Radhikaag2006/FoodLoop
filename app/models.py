@@ -216,6 +216,158 @@ class PickupLine(Base):
     tier: Mapped[str] = mapped_column(String(1))
 
 
+class Tracking(Base):
+    """The unique tracking ID (and QR) of a lot, shown to its owner."""
+    __tablename__ = "tracking"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    lot_id: Mapped[int] = mapped_column(ForeignKey("lots.id"), unique=True)
+    code: Mapped[str] = mapped_column(String(14), unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+
+
+class RunEvent(Base):
+    """When a run reached a stage, so the journey can show real times."""
+    __tablename__ = "run_events"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pickup_id: Mapped[int] = mapped_column(ForeignKey("pickups.id"))
+    kind: Mapped[str] = mapped_column(String(12))  # planned|scheduled|...
+    at: Mapped[datetime] = mapped_column(DateTime, default=now)
+    by_user: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id"), nullable=True)
+
+
+class CollectorProfile(Base):
+    """A collector's vehicle and home base, used to assign runs."""
+    __tablename__ = "collector_profiles"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
+    vehicle: Mapped[str] = mapped_column(String(40), default="")
+    capacity_kg: Mapped[float] = mapped_column(Float, default=0.0)
+    base_lat: Mapped[float] = mapped_column(Float, default=0.0)
+    base_lng: Mapped[float] = mapped_column(Float, default=0.0)
+    base_label: Mapped[str] = mapped_column(String(60), default="")
+    available: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class RunAssignment(Base):
+    """Which collector owns a run (NULL = nobody fits, anyone may claim)."""
+    __tablename__ = "run_assignments"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pickup_id: Mapped[int] = mapped_column(
+        ForeignKey("pickups.id"), unique=True)
+    collector_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id"), nullable=True)
+    declined: Mapped[str] = mapped_column(Text, default="[]")  # json user ids
+    fare_paise: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    accepted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True)       # NULL = offered, not yet accepted
+    assigned_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+
+
+class PickupSchedule(Base):
+    """Who collects a pickup and when (a 2-hour window from starts_at)."""
+    __tablename__ = "pickup_schedules"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pickup_id: Mapped[int] = mapped_column(
+        ForeignKey("pickups.id"), unique=True)
+    collector_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    starts_at: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+
+
+class FacilityDoc(Base):
+    """Scan of a facility's certificate, uploaded by a platform admin."""
+    __tablename__ = "facility_docs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    facility_id: Mapped[int] = mapped_column(
+        ForeignKey("facilities.id"), unique=True)
+    filename: Mapped[str] = mapped_column(String(120))
+    stored: Mapped[str] = mapped_column(String(200))
+    content_type: Mapped[str] = mapped_column(String(40))
+    uploaded_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    uploaded_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+
+
+class Plan(Base):
+    """Price list. All money is stored in paise (1/100 rupee).
+    kind=ride:  base_paise per pickup + rates (paise per kg, by tier).
+    kind=month: base_paise per month, quota_kg included; kg above the
+                quota is billed at the ride plan's per-kg rates."""
+    __tablename__ = "plans"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(20), unique=True)
+    name: Mapped[str] = mapped_column(String(60))
+    kind: Mapped[str] = mapped_column(String(6))  # ride|month
+    base_paise: Mapped[int] = mapped_column(Integer, default=0)
+    quota_kg: Mapped[float] = mapped_column(Float, default=0.0)
+    rates: Mapped[str] = mapped_column(Text, default="{}")  # json tier->paise
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class Subscription(Base):
+    """The plan an org is on. A ride plan has no end date."""
+    __tablename__ = "subscriptions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    org_id: Mapped[int] = mapped_column(ForeignKey("orgs.id"))
+    plan_id: Mapped[int] = mapped_column(ForeignKey("plans.id"))
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+    ends_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True)
+    kg_used: Mapped[float] = mapped_column(Float, default=0.0)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class Invoice(Base):
+    __tablename__ = "invoices"
+    __table_args__ = (UniqueConstraint("org_id", "pickup_id"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    org_id: Mapped[int] = mapped_column(ForeignKey("orgs.id"))
+    kind: Mapped[str] = mapped_column(String(6))  # ride|plan
+    pickup_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("pickups.id"), nullable=True)
+    plan_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("plans.id"), nullable=True)
+    description: Mapped[str] = mapped_column(String(160))
+    kg: Mapped[float] = mapped_column(Float, default=0.0)
+    amount_paise: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(
+        String(8), default="due")  # due|paid|void
+    gateway: Mapped[str] = mapped_column(String(10), default="")
+    order_id: Mapped[str] = mapped_column(String(60), default="")
+    payment_id: Mapped[str] = mapped_column(String(60), default="")
+    # json [{"label": ..., "amount_paise": ...}], the itemised bill
+    breakdown: Mapped[str] = mapped_column(Text, default="[]")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+    paid_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True)
+
+
+class UpiClaim(Base):
+    """A merchant says they paid a ride bill by UPI QR. The money goes
+    straight to our UPI ID, so an admin checks it against the bank."""
+    __tablename__ = "upi_claims"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    invoice_id: Mapped[int] = mapped_column(
+        ForeignKey("invoices.id"), unique=True)
+    ref: Mapped[str] = mapped_column(String(30), default="")
+    state: Mapped[str] = mapped_column(
+        String(10), default="claimed")  # claimed|verified|rejected
+    claimed_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    claimed_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+    checked_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True)
+
+
+class PayPref(Base):
+    """How a business prefers to pay its ride bills (no card details are
+    ever stored: the gateway collects those)."""
+    __tablename__ = "pay_prefs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    org_id: Mapped[int] = mapped_column(ForeignKey("orgs.id"), unique=True)
+    method: Mapped[str] = mapped_column(String(12))  # upi|card|netbanking
+    vpa: Mapped[str] = mapped_column(String(80), default="")
+
+
 class Record(Base):
     __tablename__ = "records"
     id: Mapped[int] = mapped_column(primary_key=True)

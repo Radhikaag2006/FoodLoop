@@ -33,6 +33,8 @@ function buildSplash() {
   // deep link from the PDF QR: /verify/CODE
   const m = /^\/verify\/([^/]+)/.exec(location.pathname);
   if (m) history.replaceState(null, "", "/#/verify/" + m[1]);
+  const tk = /^\/track\/([^/]+)/.exec(location.pathname);       // from a tracking QR
+  if (tk) history.replaceState(null, "", "/#/track/" + tk[1]);
   if (!location.hash || location.hash === "#/" || location.hash === "#") {
     const u = S.user;
     const dest = u ? (u.status === "pending" ? "/pending" : HOME[u.role])

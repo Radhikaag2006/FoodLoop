@@ -12,6 +12,7 @@ route("/a/overview", { roles: ADM, tabs: true, title: "Overview" }, async (el) =
     ${o.mismatches ? `<div class="gap"></div>${banner("warn", `${o.mismatches} run${o.mismatches > 1 ? "s" : ""} with a weight mismatch`, "Worth a look before the next audit.", "scale")}` : ""}
     ${section("People")}<div class="list">${Object.entries({ business: "Businesses", hub: "Collectors", admin: "Admins" })
       .map(([k, t]) => `<div class="li"><span class="li-main">${t}</span><b>${u[k] || 0}</b></div>`).join("")}</div>
+    ${section("Revenue")}<div class="list"><a class="li" href="#/a/billing"><span class="li-ic">${icon("wallet", 20)}</span><span class="li-main">Revenue and plans<span class="sub">Invoices, payments and price list</span></span>${icon("chevron-right", 20)}</a></div>
     ${section("Collector invites")}<button class="btn block" id="inv">${icon("key-round", 20)} Create collector invite</button><div class="gap"></div><div id="il"></div>`;
   const il = async () => { const r = await api("/api/admin/invites");
     $("#il", el).innerHTML = r.length ? `<div class="list">${r.map((i) => `<div class="li"><span class="li-ic warn">${icon("key-round", 20)}</span><div class="li-main"><span class="num" style="letter-spacing:.1em">${esc(i.code)}</span><span class="sub">${esc(i.note || "Collector")} · expires ${fmtDay(i.expires)}</span></div>
@@ -51,7 +52,7 @@ route("/a/sites", { roles: ADM, tabs: true, title: "Facilities" }, async (el) =>
     el.innerHTML = `<button class="btn block" id="add">${icon("plus", 20)} Add facility</button><div class="gap"></div>
       ${rows.length ? `<div class="list">${rows.map((f) => `<button class="li" data-f="${f.id}"><span class="li-ic ${f.certified ? "" : "mute"}">${icon("factory", 20)}</span>
         <span class="li-main">${esc(f.name)}${f.active ? "" : ' <span class="chip">Hidden</span>'}<span class="sub">${[...f.tiers].map(tierChip).join(" ")} ${f.certified ? `<span class="chip ok">${esc(f.cert_no || "Certified")}</span>` : ""}</span></span>${icon("chevron-right", 20)}</button>`).join("")}</div>`
-        : empty("No facilities yet", "Add the compost units, biogas plants, processors and NGOs you partner with. Matching only works with these.", "greens")}`;
+        : empty("No facilities yet", "Add the compost units, biogas plants, processors and feed makers you partner with. Matching only works with these.", "greens")}`;
     $("#add", el).onclick = () => facForm(null, draw);
     $$("[data-f]", el).forEach((b) => b.onclick = () => facForm(rows.find((x) => x.id === +b.dataset.f), draw));
   };
@@ -61,15 +62,20 @@ function facForm(f, done) {
   const cities = (S.cat && S.cat.cities) || {};
   sheet(`<h2>${f ? "Edit facility" : "Add facility"}</h2><div class="gap-s"></div>
     <div class="field"><label for="n">Name</label><input id="n" value="${esc(f?.name || "")}"></div>
-    <div class="grid2"><div class="field"><label for="k">Type</label><select id="k">${["ngo", "processor", "feed", "compost", "biogas", "recycler"].map((k) => `<option ${f?.kind === k ? "selected" : ""}>${k}</option>`).join("")}</select></div>
+    <div class="grid2"><div class="field"><label for="k">Type</label><select id="k">${["processor", "feed", "compost", "biogas", "recycler"].map((k) => `<option ${f?.kind === k ? "selected" : ""}>${k}</option>`).join("")}</select></div>
     <div class="field"><label for="cap">Capacity (kg)</label><input id="cap" type="number" value="${f?.capacity_kg ?? ""}"></div></div>
-    <div class="field"><label>Takes these routes</label><div class="row wrap" id="tr">${Object.entries(TIERS).map(([k, t]) => `<label class="chip t${k}" style="cursor:pointer;padding:8px 12px"><input type="checkbox" value="${k}" ${f?.tiers.includes(k) ? "checked" : ""} style="width:16px;height:16px;min-height:0;margin-right:4px"> ${k} ${t}</label>`).join("")}</div></div>
-    <div class="toggle ${f?.certified ? "on" : ""}" id="cert" role="switch"><div><b>Has a valid certificate</b><div class="small muted">Required for Recover (D) and Packaging (E)</div></div><span class="sw"></span></div><div class="gap"></div>
+    <div class="field"><label>Takes these routes</label><div class="row wrap" id="tr">${Object.entries(TIERS).map(([k, t]) => `<label class="chip t${k}" style="cursor:pointer;padding:8px 12px"><input type="checkbox" value="${k}" ${f?.tiers.includes(k) ? "checked" : ""} style="width:16px;height:16px;min-height:0;margin-right:4px"> ${TIER_LETTER[k]} ${t}</label>`).join("")}</div></div>
+    <div class="toggle ${f?.certified ? "on" : ""}" id="cert" role="switch"><div><b>Has a valid certificate</b><div class="small muted">Required for Recover (C) and Packaging (D)</div></div><span class="sw"></span></div><div class="gap"></div>
     <div class="field"><label for="cn">Certificate number</label><input id="cn" value="${esc(f?.cert_no || "")}"></div>
     <div class="grid2"><div class="field"><label for="la">Latitude</label><input id="la" type="number" step="any" value="${f?.lat ?? ""}"></div><div class="field"><label for="lo">Longitude</label><input id="lo" type="number" step="any" value="${f?.lng ?? ""}"></div></div>
     <div class="field"><label for="ad">Address</label><input id="ad" value="${esc(f?.address || "")}"></div>
     <div class="grid2"><div class="field"><label for="ph">Phone</label><input id="ph" type="tel" value="${esc(f?.phone || "")}"></div>
     <div class="field"><label for="rt">₹ per kg</label><input id="rt" type="number" step="0.1" value="${f?.rate_per_kg ?? 0}"><div class="hint">+ they pay you, − gate fee</div></div></div>
+    ${f ? `<div class="field"><label>Certificate document</label><div class="small muted" id="docst">${f.has_document ? 'A document is on file. <a href="/api/facilities/' + f.id + '/document" target="_blank" rel="noopener">View</a>' : "No document uploaded yet."}</div>
+      <input id="docf" type="file" accept="application/pdf,image/png,image/jpeg" style="margin-top:8px">
+      <div class="btn-row" style="margin-top:8px"><button type="button" class="btn secondary" id="docup">Upload</button>${f.has_document ? '<button type="button" class="btn ghost" id="docrm">Remove</button>' : ""}</div>
+      <div class="hint">PDF, PNG or JPEG, up to 5 MB. Businesses can open it from their pickup.</div></div>`
+      : `<p class="small muted">Save the facility first, then you can upload its certificate.</p>`}
     <div class="err" id="err" style="color:var(--bad);font-weight:600;margin-bottom:8px"></div>
     <button class="btn block" id="s">Save</button>${f ? `<div class="gap-s"></div><button class="btn ghost block" id="tg">${f.active ? "Hide from matching" : "Show in matching"}</button>` : ""}`, (s, close) => {
     wireToggle($("#cert", s));
@@ -77,6 +83,12 @@ function facForm(f, done) {
       const b = { name: v("n", s), kind: $("#k", s).value, capacity_kg: +v("cap", s), tiers: $$("#tr input:checked", s).map((i) => i.value).join(""),
         certified: $("#cert", s).classList.contains("on"), cert_no: v("cn", s), lat: +v("la", s), lng: +v("lo", s), address: v("ad", s), phone: v("ph", s), rate_per_kg: +v("rt", s) };
       try { f ? await put("/api/admin/facilities/" + f.id, b) : await post("/api/admin/facilities", b); close(); toast("Saved"); done(); } catch (x) { $("#err", s).textContent = x.message; } });
+    const up = $("#docup", s); if (up) up.onclick = () => busy(up, async () => {
+      const file = $("#docf", s).files[0]; if (!file) { $("#err", s).textContent = "Choose a file first."; return; }
+      const fd = new FormData(); fd.append("file", file);
+      try { await api(`/api/facilities/${f.id}/document`, { method: "POST", body: fd }); close(); toast("Certificate uploaded"); done(); }
+      catch (x) { $("#err", s).textContent = x.message; } });
+    const rm = $("#docrm", s); if (rm) rm.onclick = () => busy(rm, async () => { await del(`/api/facilities/${f.id}/document`); close(); toast("Removed"); done(); });
     const tg = $("#tg", s); if (tg) tg.onclick = () => busy(tg, async () => { await post(`/api/admin/facilities/${f.id}/toggle`); close(); done(); });
   });
 }

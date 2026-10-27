@@ -6,7 +6,9 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
   { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 const S = { user: null, cat: null, cleanup: null };
-const TIERS = { A: "Rescue", B: "Process", C: "Feed", D: "Recover", E: "Packaging" };
+// Stored keys (B..E) never change; people see A..D.
+const TIER_LETTER = { B: "A", C: "B", D: "C", E: "D" };
+const TIERS = { B: "Process", C: "Feed", D: "Recover", E: "Packaging" };
 
 class ApiError extends Error {
   constructor(m, status) { super(m); this.status = status; }
@@ -70,7 +72,7 @@ function greet() {
 const initials = (n) => (n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 
 /* ---------- small UI parts ---------- */
-const tierChip = (t) => t ? `<span class="chip t${t}"><b>${t}</b> ${TIERS[t]}</span>` : "";
+const tierChip = (t) => t ? `<span class="chip t${t}"><b>${TIER_LETTER[t] || t}</b> ${TIERS[t] || "Retired"}</span>` : "";
 const lockChips = (l) => (l || []).map((t) =>
   `<span class="chip lock">${icon("lock", 12)} ${TIERS[t]}</span>`).join(" ");
 const STATUS = {
@@ -83,11 +85,15 @@ const STATUS = {
 const statusChip = (s) => { const [c, t] = STATUS[s] || ["", s]; return `<span class="chip ${c}">${t}</span>`; };
 
 const ITEM_VIS = {
-  tomato: { veg: "tomato" }, greens: { veg: "greens" }, kitchen_waste: { veg: "carrot" },
-  banana: { ic: "apple" }, bread: { ic: "wheat" }, biscuits: { ic: "cookie" }, grains: { ic: "wheat" },
-  dairy: { ic: "milk" }, ready_pack: { ic: "package" }, packaging: { ic: "recycle" },
+  vegetables: { veg: "cat_vegetables" }, fruits: { veg: "cat_fruits" }, dairy: { veg: "cat_dairy" },
+  bakery: { veg: "cat_bakery" }, grains: { veg: "cat_grains" }, snacks: { veg: "cat_snacks" },
+  cooked: { veg: "cat_cooked" }, kitchen_waste: { veg: "cat_kitchen_waste" }, packaging: { veg: "cat_packaging" },
 };
-const itemVis = (k, s = 40) => { const v = ITEM_VIS[k] || { ic: "leaf" };
+/* A photo in static/img/items/<category>.jpg|png|webp replaces the drawing. */
+const itemVis = (k, s = 40) => {
+  const photo = ((S.cat && S.cat.items) || []).find((i) => i.key === k);
+  if (photo && photo.image) return `<img src="${photo.image}" alt="" width="${s}" height="${s}" style="object-fit:cover;border-radius:${Math.round(s / 5)}px">`;
+  const v = ITEM_VIS[k] || { ic: "leaf" };
   return v.veg ? veg(v.veg, s) : icon(v.ic, Math.round(s * 0.7)); };
 
 function empty(title, text, vegName = "greens", action = "") {
@@ -184,11 +190,11 @@ const go = (p, replace) => {
   if (replace) location.replace("#" + p); else location.hash = p;
 };
 const HOME = {
-  business: "/b/home", hub: "/h/pool", admin: "/a/overview" };
+  business: "/b/home", hub: "/h/week", admin: "/a/overview" };
 const TABS = {
   business: [["/b/home", "Home", "home"], ["/b/lots", "Lots", "boxes"],
     ["/b/add", "Add lot", "plus", "fab"], ["/b/records", "Records", "file-text"], ["/me", "Account", "user"]],
-  hub: [["/h/pool", "Pool", "layers"], ["/h/runs", "Runs", "truck"], ["/h/sites", "Sites", "factory"],
+  hub: [["/h/week", "Week", "calendar"], ["/h/pool", "Pool", "layers"], ["/h/runs", "Runs", "truck"], ["/h/sites", "Sites", "factory"],
     ["/me", "Account", "user"]],
   admin: [["/a/overview", "Overview", "bar-chart-3"], ["/a/verify", "Verify", "badge-check"],
     ["/a/sites", "Sites", "factory"], ["/a/people", "People", "users"], ["/me", "Account", "user"]],

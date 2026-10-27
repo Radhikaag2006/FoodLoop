@@ -8,7 +8,8 @@ from sqlalchemy import func, or_, select
 from ..clock import iso, utcnow
 from ..db import get_db
 from ..deps import need, notify_role
-from ..models import Facility, Invite, Org, Pickup, Record, User
+from ..models import (Facility, FacilityDoc, Invite, Org, Pickup, Record,
+                      User)
 from ..security import clean, make_code, norm_phone
 from .auth import issue_reset
 
@@ -88,8 +89,10 @@ class FacIn(BaseModel):
     rate_per_kg: float = 0.0
 
 
-def _fac_dict(f):
-    return {"id": f.id, "name": f.name, "kind": f.kind, "tiers": f.tiers,
+def _fac_dict(f, db=None):
+    has_doc = bool(db and db.scalar(select(FacilityDoc.id).where(
+        FacilityDoc.facility_id == f.id)))
+    return {"has_document": has_doc, "id": f.id, "name": f.name, "kind": f.kind, "tiers": f.tiers,
             "lat": f.lat, "lng": f.lng, "capacity_kg": f.capacity_kg,
             "certified": f.certified, "cert_no": f.cert_no,
             "address": f.address, "phone": f.phone,
@@ -97,7 +100,7 @@ def _fac_dict(f):
 
 
 def _fill(f, b):
-    tiers = "".join(sorted(set(b.tiers.upper()) & set("ABCDE")))
+    tiers = "".join(sorted(set(b.tiers.upper()) & set("BCDE")))
     if not tiers:
         raise HTTPException(422, "Pick at least one tier.")
     if ("D" in tiers or "E" in tiers) and not (
@@ -116,7 +119,7 @@ def _fill(f, b):
 
 @router.get("/facilities")
 def facilities(db=Depends(get_db), u=Depends(adm)):
-    return [_fac_dict(f) for f in db.scalars(
+    return [_fac_dict(f, db) for f in db.scalars(
         select(Facility).order_by(Facility.id))]
 
 

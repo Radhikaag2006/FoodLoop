@@ -1,19 +1,21 @@
 from datetime import date
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import select
 
 from .. import config as C
+from .. import tracking as T
+from ..billing import require_access
 from ..clock import iso, local_day
 from ..db import get_db
 from ..deps import need
-from ..matching import facility_dict, rank_facilities
+from ..matching import rank_facilities
 from ..models import Facility, Lot, Org, Pickup, PickupLine
 from ..security import clean, norm_phone
-from ..tiers import CATALOG, TIERS, classify
-from .shared import csv_response, pickup_dict
+from ..tiers import CATALOG, classify, item_info, resolve, tier_name
+from .shared import csv_response, facility_card, pickup_dict
 
 router = APIRouter(prefix="/api/business")
 biz = need("business")
@@ -39,18 +41,29 @@ def _check(b):
         raise HTTPException(422, str(e))
 
 
+def _best_match(db, org, tier, kg):
+    """Only the single best plant, and never its price or fee."""
+    ranked = rank_facilities(db, tier, org.lat, org.lng, kg, 1)
+    return facility_card(db, ranked[0]["facility"],
+                         ranked[0]["distance_km"]) if ranked else None
+
+
 def _with_matches(db, org, info, kg):
-    ranked = rank_facilities(db, info["tier"], org.lat, org.lng, kg)
-    info["matches"] = [facility_dict(r) for r in ranked]
+    info["match"] = _best_match(db, org, info["tier"], kg)
     return info
 
 
-def _lot(lot):
-    return {"id": lot.id, "item": CATALOG[lot.item]["label"],
-            "key": lot.item, "condition": lot.condition,
+def _own_view(d):
+    """Drop the route: it lists other businesses' names and phones."""
+    return {k: v for k, v in d.items() if k != "route"}
+
+
+def _lot(lot, code=""):
+    return {"track_code": code, "id": lot.id, "item": item_info(lot.item)["label"],
+            "key": resolve(lot.item), "condition": lot.condition,
             "qty_kg": lot.qty_kg,
             "expiry": lot.expiry.isoformat() if lot.expiry else "",
-            "tier": lot.tier, "tier_name": TIERS[lot.tier],
+            "tier": lot.tier, "tier_name": tier_name(lot.tier),
             "status": "planned" if lot.pickup_id else "waiting",
             "pickup_id": lot.pickup_id, "at": iso(lot.created_at)}
 
@@ -63,12 +76,15 @@ def preview(b: LotIn, db=Depends(get_db), u=Depends(biz)):
 @router.post("/lots")
 def add_lot(b: LotIn, db=Depends(get_db), u=Depends(biz)):
     info = _check(b)
+    require_access(db, u.org_id)       # free trial, plan or unpaid dues
     lot = Lot(org_id=u.org_id, item=b.item, condition=b.condition,
               qty_kg=b.qty_kg, expiry=b.expiry, tier=info["tier"])
     db.add(lot)
+    db.flush()
+    code = T.code_for(db, lot.id)
     db.commit()
     info = _with_matches(db, db.get(Org, u.org_id), info, b.qty_kg)
-    info["lot"] = _lot(lot)
+    info["lot"] = _lot(lot, code)
     return info
 
 
@@ -76,7 +92,9 @@ def add_lot(b: LotIn, db=Depends(get_db), u=Depends(biz)):
 def lots(db=Depends(get_db), u=Depends(biz)):
     rows = db.scalars(select(Lot).where(Lot.org_id == u.org_id)
                       .order_by(Lot.id.desc()).limit(100)).all()
-    return [_lot(x) for x in rows]
+    codes = T.codes_for(db, rows)
+    db.commit()                 # older lots get their ID the first time
+    return [_lot(x, codes[x.id]) for x in rows]
 
 
 def _pickup_for(db, p, org_id):
@@ -91,15 +109,17 @@ def _pickup_for(db, p, org_id):
     for ln in lines:
         lot = db.get(Lot, ln.ref_id) if ln.ref_type == "lot" else None
         items.append({"lot_id": lot.id if lot else None,
-                      "item": CATALOG[lot.item]["label"] if lot else "",
+                      "item": item_info(lot.item)["label"] if lot else "",
                       "kg": round(ln.kg, 2), "tier": ln.tier,
-                      "tier_name": TIERS[ln.tier]})
+                      "tier_name": tier_name(ln.tier)})
     stop = next((s for s in d["route"] if s["org_id"] == org_id), None)
     return {
         "id": p.id, "status": p.status, "record": d["record"],
         "facility": fac.name, "facility_kind": fac.kind,
         "facility_address": fac.address, "facility_phone": fac.phone,
         "certified": fac.certified, "cert_no": fac.cert_no,
+        "facility_card": facility_card(db, fac),
+        "schedule": d["schedule"],
         "created_at": d["created_at"], "closed_at": d["closed_at"],
         "your_kg": round(mine, 1), "expected_kg": p.expected_kg,
         "hub_kg": p.hub_kg, "facility_kg": p.facility_kg,
@@ -114,11 +134,15 @@ def _pickup_for(db, p, org_id):
 
 
 @router.get("/lots/{lid}")
-def lot_detail(lid: int, db=Depends(get_db), u=Depends(biz)):
+def lot_detail(lid: int, request: Request, db=Depends(get_db),
+               u=Depends(biz)):
     lot = db.get(Lot, lid)
     if not lot or lot.org_id != u.org_id:
         raise HTTPException(404, "Lot not found.")
-    out = _lot(lot)
+    code = T.code_for(db, lot.id)
+    db.commit()
+    out = _lot(lot, code)
+    out["track"] = T.qr_for(str(request.base_url), code)
     why = classify(lot.item, lot.condition, lot.expiry)
     out.update(route=why["route"], reason=why["reason"],
                locked=why["locked"], urgency=why["urgency"],
@@ -129,8 +153,7 @@ def lot_detail(lid: int, db=Depends(get_db), u=Depends(biz)):
         out["pickup"] = _pickup_for(db, db.get(Pickup, lot.pickup_id),
                                     u.org_id)
     else:
-        out["matches"] = [facility_dict(r) for r in rank_facilities(
-            db, lot.tier, org.lat, org.lng, lot.qty_kg)]
+        out["match"] = _best_match(db, org, lot.tier, lot.qty_kg)
     return out
 
 
@@ -166,7 +189,7 @@ def home(db=Depends(get_db), u=Depends(biz)):
         by_tier[x.tier] = by_tier.get(x.tier, 0) + x.qty_kg
     ids = set(db.scalars(select(PickupLine.pickup_id).where(
         PickupLine.org_id == u.org_id)))
-    pk = [pickup_dict(db, p) for p in db.scalars(
+    pk = [_own_view(pickup_dict(db, p)) for p in db.scalars(
         select(Pickup).order_by(Pickup.id.desc())) if p.id in ids]
     done = [p for p in pk if p["status"] == "closed"]
     lines = db.scalars(select(PickupLine).where(
@@ -191,7 +214,7 @@ def pickups(db=Depends(get_db), u=Depends(biz)):
     ids = set(db.scalars(select(PickupLine.pickup_id).where(
         PickupLine.org_id == u.org_id)))
     rows = db.scalars(select(Pickup).order_by(Pickup.id.desc())).all()
-    return [pickup_dict(db, p) for p in rows if p.id in ids][:40]
+    return [_own_view(pickup_dict(db, p)) for p in rows if p.id in ids][:40]
 
 
 class ProfileIn(BaseModel):
