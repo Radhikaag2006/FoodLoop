@@ -172,8 +172,13 @@ function makeMap(el, center, zoom = 11) {
   if (typeof L === "undefined") return null;
   L.Icon.Default.imagePath = "/static/vendor/leaflet/images/";
   const m = L.map(el, { scrollWheelZoom: false }).setView(center, zoom);
+  // OpenStreetMap refuses tile requests that carry no Referer, and the app's
+  // Referrer-Policy is same-origin, so tiles must send the origin explicitly.
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-    { maxZoom: 18, attribution: "© OpenStreetMap" }).addTo(m);
+    { maxZoom: 19, referrerPolicy: "origin",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(m);
+  // cards are drawn before they have a size; recalc so every tile loads
+  setTimeout(() => m.invalidateSize(), 150);
   return m;
 }
 const pin = (cls, label) => L.divIcon({ className: "", iconSize: [30, 30], iconAnchor: [15, 15],
