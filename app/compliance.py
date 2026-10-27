@@ -78,6 +78,22 @@ SEMANTIC_CONCEPTS: Dict[str, List[str]] = {
         "traceability", "tamper", "tamper-evident", "audit", "record", "records",
         "log", "consignment", "hash", "fbo", "license", "registration", "verification"
     ],
+    "COOKING_OIL_BIODIESEL": [
+        "cooking", "oil", "used", "fryer", "ruco", "tpc", "polar", "compounds",
+        "grease", "drain", "sewage", "biodiesel", "biofuel", "re repurpose"
+    ],
+    "PACKAGING_DE_PACKAGING": [
+        "packaging", "plastic", "plastics", "de-packaging", "wrapper", "wrappers",
+        "foil", "bottle", "bottles", "sachet", "polybag", "microplastic", "pouch"
+    ],
+    "COLD_CHAIN_LOGISTICS": [
+        "cold", "chain", "reefer", "transit", "truck", "frozen", "chill",
+        "breach", "temperature-abused", "schedule", "iv"
+    ],
+    "BULK_WASTE_GENERATOR": [
+        "bulk", "waste", "generator", "bwg", "100kg", "100", "kg", "ban",
+        "on-site", "complex", "hotel", "banquet", "mall"
+    ],
 }
 
 

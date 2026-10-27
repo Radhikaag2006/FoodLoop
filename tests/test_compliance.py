@@ -80,4 +80,21 @@ def test_compliance_api_routes(anon):
     # Test listing regulations
     r3 = anon.get("/api/compliance/regulations")
     assert r3.status_code == 200
-    assert len(r3.json()["regulations"]) >= 5
+    assert len(r3.json()["regulations"]) >= 10
+
+    # Test hallucination benchmark API
+    r4 = anon.get("/api/compliance/eval/benchmark")
+    assert r4.status_code == 200
+    b_data = r4.json()
+    assert b_data["pass_rate_pct"] == 100.0
+    assert b_data["metrics"]["hallucination_risk_index"] <= 0.15
+
+
+def test_hallucination_evaluation_suite():
+    from app.hallucination_eval import run_hallucination_benchmark
+    res = run_hallucination_benchmark()
+    assert res["passed_cases"] == 6
+    assert res["pass_rate_pct"] == 100.0
+    assert res["metrics"]["average_safety_guardrail"] == 1.0
+    assert res["overall_verdict"] == "CERTIFIED_GROUNDED"
+

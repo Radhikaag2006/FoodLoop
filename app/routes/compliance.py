@@ -44,3 +44,18 @@ def ask_copilot(b: AskIn, u: User = Depends(current_user)):
 def list_regulations(u: User = Depends(current_user)):
     """Returns the indexed repository of FSSAI, DAHD, and CPCB regulations."""
     return {"regulations": C.get_all_regulations()}
+
+
+@router.get("/eval/benchmark")
+def get_benchmark(u: User = Depends(current_user)):
+    """Retrieves stored RAG hallucination and faithfulness benchmark metrics."""
+    from ..hallucination_eval import get_cached_benchmark
+    return get_cached_benchmark()
+
+
+@router.post("/eval/run")
+def trigger_benchmark(u: User = Depends(current_user)):
+    """Re-runs the 6 adversarial hallucination test cases and updates benchmark scores."""
+    from ..hallucination_eval import run_hallucination_benchmark
+    return run_hallucination_benchmark()
+
