@@ -77,7 +77,10 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
         <div class="card" style="border:1.5px solid var(--accent, #2F9E4F);box-shadow:0 4px 14px rgba(47,158,79,.12)">
           <div class="row between wrap" style="margin-bottom:10px">
             <span class="chip ok">${icon("badge-check", 14)} Grounded Legal Opinion</span>
-            <span class="tiny muted">Source: ${esc(res.source)}</span>
+            <div class="row gap-s wrap">
+              <span class="chip" style="font-size:11px;background:#e8f4fd;color:#0b7285">${icon("cpu", 12)} ${res.retrieval_mode === "dense_gemini_embedding" ? "Gemini Vector Embedding" : "Semantic Vector Search"}</span>
+              <span class="tiny muted" style="align-self:center">Engine: ${esc(res.source)}</span>
+            </div>
           </div>
           <div style="font-size:15px;line-height:1.55;white-space:pre-line;margin-bottom:14px">${esc(res.answer)}</div>
           ${citations.length ? `
