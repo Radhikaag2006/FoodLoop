@@ -1,6 +1,6 @@
-/* FSSAI & Environmental Waste Regulatory Copilot (Semantic RAG + Legal Grounding) */
+/* FSSAI & Environmental Waste Regulatory Personal Assistant (Semantic RAG + Legal Grounding) */
 
-route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => {
+route("/compliance", { tabs: true, title: "Personal Assistant" }, async (el) => {
   let regs = [];
   try {
     const data = await api("/api/compliance/regulations");
@@ -12,7 +12,7 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
   el.innerHTML = `
     <div class="row between wrap" style="gap:10px;margin-bottom:16px">
       <div>
-        <h1 style="font-size:24px;margin:0">FSSAI & Waste Copilot</h1>
+        <h1 style="font-size:24px;margin:0">FSSAI & Waste Personal Assistant</h1>
         <p class="muted small" style="margin:4px 0 0">Semantic RAG intelligence grounded in Indian food safety & environmental law.</p>
       </div>
       <div class="row gap-s">
@@ -21,9 +21,9 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
       </div>
     </div>
 
-    <!-- Copilot Inquiry Card -->
+    <!-- Personal Assistant Inquiry Card -->
     <div class="card" style="margin-bottom:16px;border-left:4px solid var(--accent, #2F9E4F);box-shadow:0 2px 10px rgba(0,0,0,.04)">
-      <div class="lbl" style="margin-bottom:8px">Ask the Regulatory Copilot</div>
+      <div class="lbl" style="margin-bottom:8px">Ask your Personal Assistant</div>
       <form id="copilot-f" style="display:flex;gap:8px;flex-wrap:wrap">
         <input id="copilot-q" style="flex:1;min-width:240px" placeholder="e.g. Can expired dairy or catering scraps go to cattle feed?">
         <button class="btn" id="copilot-go" type="submit" style="min-width:110px">${icon("search", 18)} Consult Law</button>

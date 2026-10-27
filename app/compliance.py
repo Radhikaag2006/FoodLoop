@@ -1,4 +1,4 @@
-"""FSSAI & Environmental Waste Compliance Engine (Semantic RAG + AI Copilot).
+"""FSSAI & Environmental Waste Compliance Engine (Semantic RAG + Personal Assistant).
 
 Grounds FoodLoop's routing in official FSSAI Surplus Food Regulations (2019),
 Solid Waste Management Rules (2016), and Food Safety and Standards Act (2006).
@@ -9,7 +9,7 @@ Features:
      - Latent Semantic Concept Vector Index (dense domain ontology projection & cosine similarity fallback).
   2. Hybrid Fusion (Semantic Vector Similarity + BM25 Lexical Score).
   3. Automated Lot Compliance Check (verifies safety tier restrictions).
-  4. Interactive Regulatory Copilot (answers compliance questions with exact citations,
+  4. Interactive Regulatory Personal Assistant (answers compliance questions with exact citations,
      supporting Gemini API when configured, with grounded synthesis fallback).
 """
 import json
@@ -456,7 +456,7 @@ def _ask_gemini(query: str, retrieved_chunks: List[Dict[str, Any]], api_key: str
     ])
 
     prompt = (
-        "You are the FoodLoop FSSAI & Environmental Regulatory Compliance Copilot for Indian Food Businesses.\n"
+        "You are the FoodLoop FSSAI & Environmental Regulatory Personal Assistant for Indian Food Businesses.\n"
         "You understand everyday Indian food, catering, and business terms:\n"
         "- Roti, chapati, phulka, paratha, naan, bread, chawal (rice), dalia, grains\n"
         "- Gaushala, goshala (bovine cattle shelter), cows, buffaloes\n"
