@@ -155,10 +155,10 @@ route("/b/home", { roles: BIZ, tabs: true, title: "Home" }, async (el) => {
     <div class="card" style="margin-top:14px;background:linear-gradient(135deg, rgba(47,158,79,0.08), rgba(244,249,245,0.9));border:1px solid rgba(47,158,79,0.25)">
       <div class="row between wrap" style="gap:8px">
         <div style="flex:1;min-width:200px">
-          <div style="font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px">${icon("shield-check", 18)} FSSAI & Waste Personal Assistant <span class="chip ok sm" style="font-size:10px;padding:2px 6px">AI / RAG</span></div>
-          <div class="small muted" style="margin-top:2px">Consult statutory RAG on food safety rules, swill feed bans & disposal laws.</div>
+          <div style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px;color:#1B4332">${icon("shield-check", 18)} Regulatory Assistant</div>
+          <div class="small muted" style="margin-top:2px">Official guidance on food safety, swill feed bans, and disposal rules.</div>
         </div>
-        <a class="btn ghost sm" href="#/compliance" style="align-self:center">Ask Assistant →</a>
+        <a class="btn ghost sm" href="#/compliance" style="align-self:center">Open Assistant →</a>
       </div>
     </div>
     ${Object.keys(h.by_tier).length ? `${section("Waiting by route")}<div class="card"><div class="row wrap">${Object.entries(h.by_tier).map(([t, x]) => `${tierChip(t)} <b>${x} kg</b>`).join(' &nbsp; ')}</div></div>` : ""}
@@ -198,8 +198,8 @@ route("/b/add", { roles: BIZ, tabs: true, title: "Add a lot" }, (el) => {
       const compHTML = comp ? `
         <div class="banner ${comp.status === 'COMPLIANT' ? 'ok' : 'info'}" style="margin:10px 0 0;padding:8px 10px;font-size:12px">
           ${icon(comp.status === 'COMPLIANT' ? "badge-check" : "shield-check", 16)}
-          <div><b>FSSAI Regulatory Audit: ${comp.status === 'COMPLIANT' ? 'Verified Safe Route' : 'Mandatory Routing Law Applied'}</b>
-          <div class="tiny muted">${comp.citations && comp.citations[0] ? esc(comp.citations[0].authority + ' - ' + comp.citations[0].clause) : 'FSSAI Statutory Rules 2019'} · <a href="#/compliance">Consult Assistant</a></div></div>
+          <div><b>FSSAI Regulatory Check: ${comp.status === 'COMPLIANT' ? 'Approved Route' : 'Mandatory Recovery Applied'}</b>
+          <div class="tiny muted">${comp.citations && comp.citations[0] ? esc(comp.citations[0].authority + ': ' + comp.citations[0].clause) : 'FSSAI Statutory Rules 2019'} · <a href="#/compliance">View rules</a></div></div>
         </div>` : '';
       $("#prev", el).innerHTML = `<div class="card"><div class="row wrap">${tierChip(r.tier)} ${lockChips(r.locked)}</div>
         <p style="margin:10px 0 4px"><b>${esc(r.route)}</b></p><p class="muted small" style="margin:0">${esc(r.reason)}</p>${compHTML}</div>

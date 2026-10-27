@@ -516,19 +516,19 @@ def _offline_synthesize(query: str, chunks: List[Dict[str, Any]]) -> str:
         )
 
     out = [
-        f"### Legal Assessment: {primary['title']}",
-        f"**Governing Authority:** {primary['authority']} | *{primary['clause']}*",
+        f"Legal Assessment: {primary['title']}",
+        f"Governing Authority: {primary['authority']}, {primary['clause']}",
         "",
-        f"**Statutory Rule:** {primary['text']}",
+        f"Statutory Rule: {primary['text']}",
         "",
-        f"**Legal Mandate:** {primary['legal_mandate']}",
-        f"**FoodLoop System Action:** {primary['tier_rule']}",
+        f"Legal Mandate: {primary['legal_mandate']}",
+        f"FoodLoop Action: {primary['tier_rule']}",
     ]
 
     if len(chunks) > 1:
-        out.append("\n**Additional Applicable Regulations:**")
+        out.append("\nAdditional Applicable Regulations:")
         for c in chunks[1:]:
-            out.append(f"• **{c['clause']}** ({c['authority']}): {c['legal_mandate']}")
+            out.append(f"• {c['clause']} ({c['authority']}): {c['legal_mandate']}")
 
     return "\n".join(out)
 

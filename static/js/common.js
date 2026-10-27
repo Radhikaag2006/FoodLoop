@@ -18,7 +18,7 @@ route("/me", { roles: ["business", "hub", "admin"], tabs: true, title: "Account"
       <button class="li" id="edit"><span class="li-ic">${icon("pencil", 20)}</span><span class="li-main">Edit profile</span>${icon("chevron-right", 20)}</button>
       <button class="li" id="pw"><span class="li-ic">${icon("key-round", 20)}</span><span class="li-main">Change password</span>${icon("chevron-right", 20)}</button>
       <button class="li" id="notes"><span class="li-ic info">${icon("bell", 20)}</span><span class="li-main">Notifications</span>${u.unread ? `<span class="chip bad">${u.unread} new</span>` : ""}${icon("chevron-right", 20)}</button>
-      <a class="li" href="#/compliance"><span class="li-ic ok">${icon("shield-check", 20)}</span><span class="li-main"><b>Compliance Personal Assistant</b> <span class="chip ok sm" style="font-size:10px;padding:2px 6px">AI / RAG</span></span>${icon("chevron-right", 20)}</a>
+      <a class="li" href="#/compliance"><span class="li-ic ok">${icon("shield-check", 20)}</span><span class="li-main"><b>Regulatory Assistant</b></span>${icon("chevron-right", 20)}</a>
       <button class="li" id="inst" style="display:none"><span class="li-ic">${icon("smartphone", 20)}</span><span class="li-main">Install FoodLoop on this device</span>${icon("chevron-right", 20)}</button>
       <a class="li" href="#/verify"><span class="li-ic mute">${icon("shield-check", 20)}</span><span class="li-main">Check a disposal record</span>${icon("chevron-right", 20)}</a>
       <a class="li" href="#/legal"><span class="li-ic mute">${icon("file-text", 20)}</span><span class="li-main">Terms and privacy</span>${icon("chevron-right", 20)}</a>
