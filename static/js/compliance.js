@@ -31,7 +31,8 @@ route("/compliance", { tabs: true, title: "Compliance Copilot" }, async (el) => 
 
       <div class="small muted" style="margin-top:12px;font-weight:600">Common statutory inquiries:</div>
       <div class="row wrap" style="gap:6px;margin-top:6px" id="chips">
-        <button type="button" class="btn ghost sm chip-q" data-q="Can expired food go to cattle feed?">Cattle feed restrictions</button>
+        <button type="button" class="btn ghost sm chip-q" data-q="Can I donate left-over rotis to a gaushala?">Roti & Gaushala feed</button>
+        <button type="button" class="btn ghost sm chip-q" data-q="Can expired food go to cattle feed?">Cattle feed swill rules</button>
         <button type="button" class="btn ghost sm chip-q" data-q="Can I boil spoiled rotten chicken curry to kill germs and donate it?">Spoiled food recooking</button>
         <button type="button" class="btn ghost sm chip-q" data-q="Is it legal to pour used cooking oil down municipal sewage drains?">RUCO used cooking oil</button>
         <button type="button" class="btn ghost sm chip-q" data-q="Can packaged yogurt cups be dumped directly into compost?">Plastic de-packaging</button>

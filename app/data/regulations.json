@@ -44,6 +44,17 @@
     "tier_rule": "Tier C (Feed) is permitted ONLY for non-expired, vegetarian bakery, grain, fruit, and vegetable surplus. Expired items, meat, and dairy waste are locked out of Tier C."
   },
   {
+    "id": "FSSAI-FEED-GAUSHALA-ROTI",
+    "authority": "FSSAI & Department of Animal Husbandry (DAHD)",
+    "regulation": "Advisory on Safe Utilization of Vegetarian Catering Surplus for Livestock",
+    "clause": "Clause 4.2 - Cereal, Bakery, and Roti Donation to Bovine Shelters (Gaushalas)",
+    "title": "Donation of Bread, Roti, and Grain Residues to Gaushalas and Cattle Shelters",
+    "keywords": ["roti", "rotis", "chapati", "chapatis", "phulka", "gaushala", "goshala", "cow", "cows", "cattle", "bovine", "bread", "wheat", "atta", "grains", "langar", "temple", "prasadam"],
+    "text": "Clean, mold-free, unexpired vegetarian cereal products—including dry rotis, chapatis, bread surplus, unfermented boiled grains, and clean vegetable peels—are legally PERMITTED to be supplied to registered Gaushalas (cattle shelters) and livestock feed mills under Tier C. However, rotis showing any signs of fungal mold (Rhizopus or Aspergillus producing aflatoxins), wet rotis stored in humid containers exceeding 24 hours, or rotis mixed with spicy/oily cooked curries, dal, or non-vegetarian catering swill are strictly prohibited from animal feed due to severe rumen acidosis and mycotoxin risks. Moldy or spoiled rotis must be diverted to Tier D (compost/biogas).",
+    "legal_mandate": "Clean, vegetarian, mold-free rotis and bakery surplus can be fed to cows/gaushalas; moldy or oily cooked waste is strictly banned.",
+    "tier_rule": "FoodLoop approves clean dry rotis/chapatis for Tier C (Gaushala / Cattle Feed); flags moldy or curry-soaked stock for Tier D (Biogas / Compost)."
+  },
+  {
     "id": "CPCB-SWM-2016-R4",
     "authority": "Ministry of Environment, Forest and Climate Change (MoEFCC) & CPCB",
     "regulation": "Solid Waste Management Rules, 2016",
