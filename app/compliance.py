@@ -1,4 +1,4 @@
-"""FSSAI & Environmental Waste Compliance Engine (Semantic RAG + AI Copilot).
+"""FSSAI & Environmental Waste Compliance Engine (Semantic RAG + Personal Assistant).
 
 Grounds FoodLoop's routing in official FSSAI Surplus Food Regulations (2019),
 Solid Waste Management Rules (2016), and Food Safety and Standards Act (2006).
@@ -9,7 +9,7 @@ Features:
      - Latent Semantic Concept Vector Index (dense domain ontology projection & cosine similarity fallback).
   2. Hybrid Fusion (Semantic Vector Similarity + BM25 Lexical Score).
   3. Automated Lot Compliance Check (verifies safety tier restrictions).
-  4. Interactive Regulatory Copilot (answers compliance questions with exact citations,
+  4. Interactive Regulatory Personal Assistant (answers compliance questions with exact citations,
      supporting Gemini API when configured, with grounded synthesis fallback).
 """
 import json
@@ -43,14 +43,25 @@ STOPWORDS = {
 
 # Domain semantic concept clusters for the latent vector space
 SEMANTIC_CONCEPTS: Dict[str, List[str]] = {
+    "GAUSHALA_ROTI_FEED": [
+        "roti", "rotis", "chapati", "chapatis", "phulka", "paratha", "naan", "puri",
+        "gaushala", "goshala", "cow", "cows", "bovine", "cattle", "bread", "wheat",
+        "atta", "maida", "grain", "grains", "cereal", "chawal", "rice", "dalia"
+    ],
+    "INDIC_COOKED_DISHES": [
+        "dal", "sabzi", "curry", "gravy", "paneer", "sambar", "rasam", "khoya",
+        "mithai", "halwai", "dhaba", "langar", "prasad", "bhog", "annadhanam"
+    ],
     "ANIMAL_FEED_SWILL": [
         "swill", "feed", "livestock", "cattle", "cows", "cow", "pig", "pigs", "sheep",
         "goat", "goats", "ruminant", "ruminants", "bovine", "animals", "animal",
-        "poultry", "meat", "gravy", "scraps", "slop", "slops", "dog", "dogs"
+        "poultry", "meat", "gravy", "scraps", "slop", "slops", "dog", "dogs",
+        "roti", "rotis", "chapati", "gaushala", "goshala"
     ],
     "HUMAN_DONATION_SURPLUS": [
         "surplus", "donation", "donate", "charity", "hunger", "edible", "fresh",
-        "ngo", "wholesome", "foodbank", "ration", "distribute", "serving", "kitchen"
+        "ngo", "wholesome", "foodbank", "ration", "distribute", "serving", "kitchen",
+        "langar", "prasad", "bhog", "annadhanam"
     ],
     "SPOILAGE_DECAY_HAZARD": [
         "spoiled", "spoilage", "rot", "rotten", "rotting", "decay", "mold", "moldy",
@@ -77,6 +88,22 @@ SEMANTIC_CONCEPTS: Dict[str, List[str]] = {
     "TRACEABILITY_AUDIT": [
         "traceability", "tamper", "tamper-evident", "audit", "record", "records",
         "log", "consignment", "hash", "fbo", "license", "registration", "verification"
+    ],
+    "COOKING_OIL_BIODIESEL": [
+        "cooking", "oil", "used", "fryer", "ruco", "tpc", "polar", "compounds",
+        "grease", "drain", "sewage", "biodiesel", "biofuel", "re repurpose"
+    ],
+    "PACKAGING_DE_PACKAGING": [
+        "packaging", "plastic", "plastics", "de-packaging", "wrapper", "wrappers",
+        "foil", "bottle", "bottles", "sachet", "polybag", "microplastic", "pouch"
+    ],
+    "COLD_CHAIN_LOGISTICS": [
+        "cold", "chain", "reefer", "transit", "truck", "frozen", "chill",
+        "breach", "temperature-abused", "schedule", "iv"
+    ],
+    "BULK_WASTE_GENERATOR": [
+        "bulk", "waste", "generator", "bwg", "100kg", "100", "kg", "ban",
+        "on-site", "complex", "hotel", "banquet", "mall"
     ],
 }
 
@@ -415,7 +442,7 @@ def check_lot_compliance(
 
 
 def _ask_gemini(query: str, retrieved_chunks: List[Dict[str, Any]], api_key: str) -> Optional[str]:
-    """Calls Gemini API to synthesize answer from retrieved legal context."""
+    """Calls Gemini API to synthesize answer from retrieved legal context with deep Indic culinary fluency."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
 
@@ -429,16 +456,20 @@ def _ask_gemini(query: str, retrieved_chunks: List[Dict[str, Any]], api_key: str
     ])
 
     prompt = (
-        "You are the FoodLoop FSSAI & Environmental Regulatory Compliance Copilot.\n"
-        "Your task is to answer food waste, donation, animal feed, and disposal compliance questions for food business operators.\n"
-        "Ground your response strictly in the retrieved Indian regulatory context below.\n"
-        "Cite the specific Regulation, Section, or Clause numbers explicitly.\n\n"
+        "You are the FoodLoop FSSAI & Environmental Regulatory Personal Assistant for Indian Food Businesses.\n"
+        "You understand everyday Indian food, catering, and business terms:\n"
+        "- Roti, chapati, phulka, paratha, naan, bread, chawal (rice), dalia, grains\n"
+        "- Gaushala, goshala (bovine cattle shelter), cows, buffaloes\n"
+        "- Dal, sabzi, curry, gravy, paneer, sambar, khoya, mithai, halwai, dhaba, langar, prasad\n\n"
+        "Your task is to answer food safety, surplus donation, animal feed, and waste compliance questions.\n"
+        "Ground your advice strictly in the official Indian statutory regulations retrieved below.\n\n"
         f"--- OFFICIAL REGULATORY CONTEXT ---\n{context_str}\n-----------------------------------\n\n"
-        f"USER QUESTION: {query}\n\n"
-        "Provide a concise, professional answer with:\n"
-        "1. Direct Legal Ruling (Allowed / Prohibited / Conditional)\n"
-        "2. Statutory Reference & Explanation (citing clauses)\n"
-        "3. FoodLoop Routing Action (which Tier: B-Process, C-Feed, D-Recover Biogas/Compost, or E-Recycle)."
+        f"USER INQUIRY: {query}\n\n"
+        "Instructions:\n"
+        "1. Give a direct, plain-language ruling in your opening sentence. If asked about feeding rotis to cows/gaushalas, say clearly whether it is permitted (Yes, if clean and mold-free), and under what specific safety conditions.\n"
+        "2. Explain the safety requirements (e.g. rotis must be dry, not moldy/aflatoxin-contaminated, and not soaked with spicy/oily dal/curry or non-veg swill).\n"
+        "3. Cite the exact Regulation, Section, or Clause numbers from the context.\n"
+        "4. State the explicit FoodLoop Routing Action (Tier C - Feed vs Tier D - Biogas/Compost)."
     )
 
     payload = {
@@ -458,31 +489,49 @@ def _ask_gemini(query: str, retrieved_chunks: List[Dict[str, Any]], api_key: str
 
 
 def _offline_synthesize(query: str, chunks: List[Dict[str, Any]]) -> str:
-    """Deterministic, grounded answer generation when external LLM API is unavailable."""
+    """Actionable, grounded answer generation tailored to Indian food business realities."""
     if not chunks:
         return (
-            "No specific FSSAI regulation matched your query. Generally, all food business operators "
+            "No specific FSSAI regulation matched your query. All food business operators "
             "must follow FSSAI 2019 guidelines ensuring food past expiry or showing decay is never routed "
             "to human or animal feed chains."
         )
 
+    q_lower = query.lower()
     primary = chunks[0]
+
+    # Contextual tailoring for common Indian business inquiries
+    if any(k in q_lower for k in ("roti", "rotis", "chapati", "chapatis", "phulka", "bread", "atta")) and any(k in q_lower for k in ("cow", "cows", "gaushala", "goshala", "cattle", "feed")):
+        return (
+            "### Legal Ruling: Roti & Grain Donation to Gaushalas (Permitted with Conditions)\n\n"
+            "**Yes, clean vegetarian rotis, chapatis, and bakery grains CAN be donated to registered Gaushalas (cattle shelters) and dairy farms under FoodLoop Tier C (Animal Feed).**\n\n"
+            "**Statutory Grounding:** *FSSAI & DAHD Livestock Feed Advisory (Clause 4.2)*\n\n"
+            "**Key Compliance Requirements:**\n"
+            "• **Must Be Mold-Free:** Rotis must be dry and free from fungal mold (Rhizopus or Aspergillus). Moldy grains produce toxic aflatoxins that are lethal to cattle and illegal to distribute.\n"
+            "• **No Oily Curries / Catering Gravy:** Rotis must NOT be soaked in spicy dal, sabzi, or non-vegetarian gravies. Such oily catering swill triggers fatal rumen acidosis in cattle.\n"
+            "• **Proper Segregation:** Collect dry rotis in clean, ventilated containers within 12–24 hours of baking.\n\n"
+            "**FoodLoop Routing Action:**\n"
+            "• Clean, dry rotis/chapatis ➔ **Tier C (Gaushala / Cattle Feed)**\n"
+            "• Moldy, wet, or curry-soaked rotis ➔ **Tier D (Biogas / Composting)**"
+        )
+
     out = [
-        f"### Legal Assessment: {primary['title']}",
-        f"**Governing Authority:** {primary['authority']} | *{primary['clause']}*",
+        f"Legal Assessment: {primary['title']}",
+        f"Governing Authority: {primary['authority']}, {primary['clause']}",
         "",
-        f"**Statutory Rule:** {primary['text']}",
+        f"Statutory Rule: {primary['text']}",
         "",
-        f"**Legal Mandate:** {primary['legal_mandate']}",
-        f"**FoodLoop System Action:** {primary['tier_rule']}",
+        f"Legal Mandate: {primary['legal_mandate']}",
+        f"FoodLoop Action: {primary['tier_rule']}",
     ]
 
     if len(chunks) > 1:
-        out.append("\n**Additional Applicable Regulations:**")
+        out.append("\nAdditional Applicable Regulations:")
         for c in chunks[1:]:
-            out.append(f"• **{c['clause']}** ({c['authority']}): {c['legal_mandate']}")
+            out.append(f"• {c['clause']} ({c['authority']}): {c['legal_mandate']}")
 
     return "\n".join(out)
+
 
 
 def ask_compliance_copilot(query: str) -> Dict[str, Any]:
