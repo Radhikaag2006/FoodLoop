@@ -83,7 +83,7 @@ route("/login", { bare: true, guestOnly: true }, (el) => {
   };
   const d = $("#demo", el);
   if (d) d.onclick = () => sheet(`<h2>Demo accounts</h2><p class="muted small">Fictional data for trying the app. Password for all: <b>Demo@1234</b></p>
-    <div class="list">${DEMO_ACCOUNTS.map(([r, n, id]) => `<button class="li" data-id="${id}"><div class="avatar">${initials(n)}</div>
+    <div class="list">${DEMO_ACCOUNTS.filter(([r]) => r !== "FoodLoop admin" || S.cat.demo_admin).map(([r, n, id]) => `<button class="li" data-id="${id}"><div class="avatar">${initials(n)}</div>
       <div class="li-main">${r}<span class="sub">${n}</span></div>${icon("chevron-right", 20)}</button>`).join("")}</div>`, (s, close) => {
     $$("[data-id]", s).forEach((b) => b.onclick = () => {
       $("#id", el).value = b.dataset.id; $("#pw", el).value = "Demo@1234"; close(); $("#f", el).requestSubmit();

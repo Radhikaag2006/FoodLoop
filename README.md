@@ -28,6 +28,15 @@ Tests: `python -m pytest -q tests`.
    hub staff. Businesses sign up themselves and you verify them. Production starts empty; no demo data.
 Without Docker: set the same env vars and run the Procfile command.
 
+## Production safety
+- `DEMO_MODE` is ignored when `ENV=production` or on Render (`RENDER=true`):
+  no demo data, no "Try a demo account" button, no demo admin.
+- On every production start, demo accounts that still use the public demo
+  password are switched off, and `ADMIN_PASSWORD` may not be `Demo@1234`.
+- The admin comes from `ADMIN_EMAIL` and `ADMIN_PASSWORD` and is created only
+  when no admin exists. To reset an existing one, set `ADMIN_PASSWORD_RESET=1`
+  for one deploy, then remove it.
+
 ## Before you call it live
 - Phone OTP/SMS verification (today: password + admin verification of businesses).
 - Lawyer-reviewed Terms and Privacy (in-app text is a draft).

@@ -34,7 +34,10 @@ def catalog():
     return {"items": items, "conditions": CONDITIONS, "tiers": TIERS,
             "routes": TIER_ROUTES,
             "cities": {k: list(v) for k, v in C.CITIES.items()},
-            "demo": C.DEMO_MODE}
+            "demo": C.DEMO_MODE,
+            # the demo admin exists only while no real admin login is set
+            "demo_admin": C.DEMO_MODE and not (
+                C.ADMIN_EMAIL and C.ADMIN_PASSWORD)}
 
 
 class ClassifyIn(BaseModel):
