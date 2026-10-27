@@ -40,6 +40,10 @@ SESSION_DAYS = int(os.getenv("SESSION_DAYS", "30"))
 # First platform admin, created at startup if no admin exists.
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
+# The admin above is only created when no admin exists yet. Set this to 1
+# for one deploy to make an existing admin use ADMIN_EMAIL / ADMIN_PASSWORD
+# (forgotten password, wrong first setup). Remove it afterwards.
+ADMIN_PASSWORD_RESET = os.getenv("ADMIN_PASSWORD_RESET", "0") == "1"
 
 # Optional email for password-reset codes. Without SMTP the code is
 # only logged (development) or issued by an admin from the app.
