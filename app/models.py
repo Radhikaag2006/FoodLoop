@@ -75,7 +75,8 @@ class Invite(Base):
     note: Mapped[str] = mapped_column(String(80), default="")
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
     used_by: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("users.id"), nullable=True)
+        ForeignKey("users.id"), nullable=True)   # the latest person to join
+    uses: Mapped[int] = mapped_column(Integer, default=0)
     expires_at: Mapped[datetime] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
 

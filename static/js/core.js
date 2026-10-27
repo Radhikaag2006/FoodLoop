@@ -40,9 +40,13 @@ const del = (u) => api(u, { method: "DELETE" });
 /* ---------- formatting (India time) ---------- */
 const TZ = "Asia/Kolkata";
 const _f = (o) => new Intl.DateTimeFormat("en-IN", { timeZone: TZ, ...o });
-const F_TIME = _f({ hour: "numeric", minute: "2-digit", hour12: true });
-const F_DAY = _f({ day: "numeric", month: "short" });
-const F_DAYL = _f({ weekday: "long", day: "numeric", month: "short" });
+let F_TIME, F_DAY, F_DAYL;
+function initFormats() {            // again whenever the language changes
+  F_TIME = _f({ hour: "numeric", minute: "2-digit", hour12: true });
+  F_DAY = _f({ day: "numeric", month: "short" });
+  F_DAYL = _f({ weekday: "long", day: "numeric", month: "short" });
+}
+initFormats();
 const F_KEY = new Intl.DateTimeFormat("en-CA", { timeZone: TZ });
 const fmtTime = (i) => i ? F_TIME.format(new Date(i)).toLowerCase() : "";
 const fmtDay = (i) => i ? F_DAY.format(new Date(i)) : "";
@@ -215,7 +219,7 @@ function shellHTML(def) {
   const right = def.tabs ? `<button class="icon-btn" id="tb-bell" aria-label="Notifications">${icon("bell", 22)}
       ${unread ? `<span class="dot">${unread > 9 ? "9+" : unread}</span>` : ""}</button>` : "";
   return `<div class="shell ${def.tabs ? "" : "plain"}">
-    <header class="topbar">${back}<div class="tb-title" id="tb-title">${esc(def.title || "")}</div>${right}</header>
+    <header class="topbar">${back}<div class="tb-title" id="tb-title">${esc(def.title || "")}</div>${langBtn()}${right}</header>
     <main class="content" id="view"></main>
     ${tabs.length ? `<nav class="tabbar" aria-label="Main">${tabs.map(([p, l, ic, fab]) => {
       const on = cur === p || (p !== "/me" && cur.startsWith(p + "/"));
@@ -246,7 +250,7 @@ async function render() {
   window.scrollTo(0, 0);
   params.q = new URLSearchParams(qs || "");
   const app = $("#app");
-  if (o.bare) { app.innerHTML = `<div id="view"></div>`; }
+  if (o.bare) { app.innerHTML = `${langBtn("float")}<div id="view"></div>`; }
   else { app.innerHTML = shellHTML(o); }
   const view = $("#view");
   const bk = $("#tb-back");

@@ -172,10 +172,22 @@ def invite(b: InvIn, db=Depends(get_db), u=Depends(adm)):
 @router.get("/invites")
 def invites(db=Depends(get_db), u=Depends(adm)):
     rows = db.scalars(select(Invite).where(
-        Invite.role == "hub", Invite.used_by.is_(None),
-        Invite.expires_at > utcnow())).all()
+        Invite.role == "hub", Invite.expires_at > utcnow())
+        .order_by(Invite.id.desc())).all()
     return [{"id": i.id, "code": i.code, "note": i.note,
-             "expires": iso(i.expires_at)} for i in rows]
+             "uses": i.uses or 0, "expires": iso(i.expires_at)}
+            for i in rows]
+
+
+@router.delete("/invites/{iid}")
+def revoke_invite(iid: int, db=Depends(get_db), u=Depends(adm)):
+    """Stop a code from working. People who already joined keep their accounts."""
+    inv = db.get(Invite, iid)
+    if not inv or inv.role != "hub":
+        raise HTTPException(404, "Not found.")
+    inv.expires_at = utcnow() - timedelta(seconds=1)
+    db.commit()
+    return {"ok": True}
 
 
 @router.get("/users")

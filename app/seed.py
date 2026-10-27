@@ -137,6 +137,7 @@ def seed_demo():
 
 NEW_COLUMNS = [      # (table, column, DDL type): create_all never adds columns
     ("invoices", "breakdown", "TEXT DEFAULT '[]'"),
+    ("invites", "uses", "INTEGER DEFAULT 0"),
     ("run_assignments", "accepted_at", "TIMESTAMP"),
     ("run_assignments", "pending", "BOOLEAN DEFAULT FALSE"),
     ("run_assignments", "reason", "TEXT DEFAULT ''"),

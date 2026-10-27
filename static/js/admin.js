@@ -16,8 +16,12 @@ route("/a/overview", { roles: ADM, tabs: true, title: "Overview" }, async (el) =
     ${section("Dispatch")}<div id="dp"></div>
     ${section("Collector invites")}<button class="btn block" id="inv">${icon("key-round", 20)} Create collector invite</button><div class="gap"></div><div id="il"></div>`;
   const il = async () => { const r = await api("/api/admin/invites");
-    $("#il", el).innerHTML = r.length ? `<div class="list">${r.map((i) => `<div class="li"><span class="li-ic warn">${icon("key-round", 20)}</span><div class="li-main"><span class="num" style="letter-spacing:.1em">${esc(i.code)}</span><span class="sub">${esc(i.note || "Collector")} · expires ${fmtDay(i.expires)}</span></div>
-      <button class="icon-btn" data-sh="${esc(i.code)}" aria-label="Share">${icon("share-2", 20)}</button></div>`).join("")}</div>` : "";
+    $("#il", el).innerHTML = r.length ? `<div class="list">${r.map((i) => `<div class="li"><span class="li-ic warn">${icon("key-round", 20)}</span><div class="li-main"><span class="num" style="letter-spacing:.1em">${esc(i.code)}</span><span class="sub">${esc(i.note || "Collector")} · used ${i.uses} time${i.uses === 1 ? "" : "s"} · expires ${fmtDay(i.expires)}</span></div>
+      <button class="icon-btn" data-sh="${esc(i.code)}" aria-label="Share">${icon("share-2", 20)}</button>
+      <button class="icon-btn" data-rv="${i.id}" aria-label="Revoke">${icon("trash-2", 20)}</button></div>`).join("")}</div>` : "";
+    $$("[data-rv]", el).forEach((b) => b.onclick = async () => {
+      if (await confirmSheet({ title: "Revoke this code?", body: "It stops working right away. People who already joined keep their accounts.", ok: "Revoke" }))
+        busy(b, async () => { await del("/api/admin/invites/" + b.dataset.rv); toast("Code revoked"); il(); }); });
     $$("[data-sh]", el).forEach((b) => b.onclick = () => shareText(`Your FoodLoop collector invite code is ${b.dataset.sh}. Open ${location.origin} and choose "I have an invite code".`)); };
   il();
   const drawDispatch = async () => {
@@ -32,7 +36,7 @@ route("/a/overview", { roles: ADM, tabs: true, title: "Overview" }, async (el) =
   drawDispatch().catch(() => {});
   $("#inv", el).onclick = () => sheet(`<h2>Collector invite</h2><div class="field"><label for="nt">Note</label><input id="nt" placeholder="e.g. Imran, Noida hub"></div><button class="btn block" id="mk">Create code</button>`, (s, close) => {
     $("#mk", s).onclick = (e) => busy(e.currentTarget, async () => { const r = await post("/api/admin/invites", { note: v("nt", s) }); close();
-      sheet(`<h2>Invite code</h2><p class="muted small">Works for 7 days, once.</p><div class="codebox">${r.code}</div>`); il(); }); });
+      sheet(`<h2>Invite code</h2><p class="muted small">Works for 7 days. Any number of collectors can join with it.</p><div class="codebox">${r.code}</div>`); il(); }); });
 });
 
 route("/a/verify", { roles: ADM, tabs: true, title: "Verify" }, async (el) => {
