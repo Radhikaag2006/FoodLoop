@@ -11,6 +11,9 @@ services:
     build: .
     restart: always
     env_file: .env
+    # Optional dispatch settings go in .env (see README, "Dispatch"):
+    #   DISPATCH_MODE=rules|solver|shadow   DISPATCH_BATCH_SECONDS=120
+    #   SOLVER_TIME_LIMIT_S=5   OSRM_URL=http://osrm:5000 (optional)
     environment:
       DATABASE_URL: postgresql://foodloop:${DB_PASSWORD}@db:5432/foodloop
       UPLOAD_DIR: /srv/uploads
