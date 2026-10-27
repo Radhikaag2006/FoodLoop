@@ -38,8 +38,15 @@ UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")
 SESSION_DAYS = int(os.getenv("SESSION_DAYS", "30"))
 
 # First platform admin, created at startup if no admin exists.
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
+def _env(name, default=""):
+    """An environment value without stray spaces or line breaks. Hosting
+    dashboards use multi-line boxes, so an invisible newline at the end of a
+    pasted value is easy to add and would make a login impossible."""
+    return os.getenv(name, default).strip()
+
+
+ADMIN_EMAIL = _env("ADMIN_EMAIL")
+ADMIN_PASSWORD = _env("ADMIN_PASSWORD")
 # The admin above is only created when no admin exists yet. Set this to 1
 # for one deploy to make an existing admin use ADMIN_EMAIL / ADMIN_PASSWORD
 # (forgotten password, wrong first setup). Remove it afterwards.

@@ -77,3 +77,13 @@ def test_mismatch_is_explained_in_the_log(anon, monkeypatch, caplog,
     with caplog.at_level("INFO"):
         seed.bootstrap()
     assert "does not match" in caplog.text and "ADMIN_PASSWORD_RESET" in caplog.text
+
+
+def test_env_values_are_trimmed(monkeypatch):
+    """A stray newline or space in a pasted Render value must not end up in
+    the admin's email or password."""
+    monkeypatch.setenv("FL_TEST_VALUE", "  admin@gmail.com " + chr(10))
+    assert C._env("FL_TEST_VALUE") == "admin@gmail.com"
+    monkeypatch.setenv("FL_TEST_VALUE", "admin1234" + chr(13) + chr(10))
+    assert C._env("FL_TEST_VALUE") == "admin1234"
+    assert C._env("FL_NOT_SET") == ""
