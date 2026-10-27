@@ -10,7 +10,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from . import config as C
 from . import payments
 from .routes import (admin, auth, billing, business, common,
-                     facility_docs, hub, tracking)
+                     compliance, facility_docs, hub, tracking)
 from .seed import init
 
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +29,8 @@ app = FastAPI(title="FoodLoop", lifespan=lifespan, docs_url=None,
 # only allowed when Razorpay is actually configured.
 _RZP = payments.mode() == "razorpay"
 CSP = ("default-src 'self'; img-src 'self' data: blob: "
-       "https://*.tile.openstreetmap.org https://tile.openstreetmap.org"
+       "https://*.tile.openstreetmap.org https://tile.openstreetmap.org "
+       "https://*.basemaps.cartocdn.com https://basemaps.cartocdn.com"
        + (" https://*.razorpay.com" if _RZP else "") + "; "
        "style-src 'self' 'unsafe-inline'; script-src 'self'"
        + (" https://checkout.razorpay.com" if _RZP else "") + "; "
@@ -56,7 +57,7 @@ async def guard_and_headers(request: Request, call_next):
     h = resp.headers
     h["Content-Security-Policy"] = CSP
     h["X-Content-Type-Options"] = "nosniff"
-    h["Referrer-Policy"] = "same-origin"
+    h["Referrer-Policy"] = "strict-origin-when-cross-origin"
     h["Permissions-Policy"] = "camera=(self), geolocation=(self)"
     if C.IS_PROD:
         h["Strict-Transport-Security"] = "max-age=31536000"
@@ -81,8 +82,8 @@ async def bad_input(request, exc):
             "Field required", "this is required")}, status_code=422)
 
 
-for r in (auth, common, business, hub, admin, billing, facility_docs,
-          tracking):
+for r in (auth, common, business, hub, admin, billing, compliance,
+          facility_docs, tracking):
     app.include_router(r.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

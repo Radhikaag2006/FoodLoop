@@ -1,0 +1,90 @@
+[
+  {
+    "id": "FSSAI-SURPLUS-2019-C3",
+    "authority": "FSSAI",
+    "regulation": "Food Safety and Standards (Recovery and Distribution of Surplus Food) Regulations, 2019",
+    "clause": "Regulation 3 - Responsibilities of Food Business Operators",
+    "title": "General Responsibilities of Donors and Waste Disposers",
+    "keywords": ["fbo", "responsibility", "surplus", "segregation", "record keeping", "licence"],
+    "text": "Any Food Business Operator (FBO) initiating surplus food recovery or commercial disposal must be registered or licensed under FSSAI. FBOs must segregate food fit for consumption from spoiled or unwholesome food at source. Clear records must be maintained indicating the date of collection, nature of food, quantity, and the certified recipient or disposal facility.",
+    "legal_mandate": "Mandatory record-keeping and source segregation for all licensed food businesses.",
+    "tier_rule": "Businesses must be verified with active FSSAI registration before pickups are permitted."
+  },
+  {
+    "id": "FSSAI-SURPLUS-2019-C4",
+    "authority": "FSSAI",
+    "regulation": "Food Safety and Standards (Recovery and Distribution of Surplus Food) Regulations, 2019",
+    "clause": "Regulation 4 - Safe Handling and Temperature Maintenance",
+    "title": "Temperature Control and Time Limits for Perishables",
+    "keywords": ["temperature", "hot food", "cold food", "cooked food", "holding time", "chilled", "dairy"],
+    "text": "Hot cooked surplus food must be maintained at or above 65°C until delivery. Cold perishable food (dairy, cut fruits) must be kept below 5°C. Unchilled cooked food held at ambient room temperature must be consumed within a maximum window of 4 hours from preparation. Once the 4-hour window lapses, human consumption is strictly prohibited due to microbial growth risk.",
+    "legal_mandate": "Perishable food past the safe temperature holding window cannot enter human processing.",
+    "tier_rule": "Cooked food exceeding safe holding limits is strictly locked out of Tiers B and C, routing exclusively to Tier D (Biogas/Compost)."
+  },
+  {
+    "id": "FSSAI-SURPLUS-2019-C5",
+    "authority": "FSSAI",
+    "regulation": "Food Safety and Standards (Recovery and Distribution of Surplus Food) Regulations, 2019",
+    "clause": "Regulation 5 - Food Not Fit for Human Consumption",
+    "title": "Strict Lockout of Expired, Damaged, and Spoiled Stock",
+    "keywords": ["expired", "spoiled", "damaged", "use-by", "best before", "mold", "rot", "lockout"],
+    "text": "Food that has crossed its expiry date, use-by date, or displays observable spoilage (mold growth, fermentation, unpleasant odor, insect infestation, or slime) is legally defined as unfit for human consumption. It is prohibited to sell, donate, process, or redirect expired stock into food manufacturing.",
+    "legal_mandate": "Immediate mandatory lock-out of expired stock from all human food and edible processing chains.",
+    "tier_rule": "Expired or spoiled lots are automatically locked out of Tiers B (Process) and C (Feed). Allowed destination is strictly Tier D (Certified Compost / Anaerobic Digestion)."
+  },
+  {
+    "id": "FSSAI-FEED-2021-SWILL",
+    "authority": "FSSAI & Department of Animal Husbandry (DAHD)",
+    "regulation": "Livestock Feed and Swill Feeding Prevention Guidelines",
+    "clause": "Section 4 - Prohibited Materials in Animal Feed",
+    "title": "Animal Feed Safety and Swill Feeding Restrictions",
+    "keywords": ["cattle feed", "animal feed", "swill", "meat", "livestock", "dairy", "bakery", "feed mill"],
+    "text": "To prevent Bovine Spongiform Encephalopathy (BSE) and zoonotic pathogens, feeding catering waste, meat scraps, or poultry-contaminated swill to cattle, sheep, goats, and livestock is strictly illegal. Animal feed manufacturers may only accept clean, unexpired, vegetarian surplus such as bakery scraps, non-moldy grain residues, and clean fruit/vegetable trimmings. Expired, moldy, or mycotoxin-contaminated grains are strictly banned from feed.",
+    "legal_mandate": "Non-vegetarian catering waste, expired foods, and moldy produce must never be routed to livestock feed.",
+    "tier_rule": "Tier C (Feed) is permitted ONLY for non-expired, vegetarian bakery, grain, fruit, and vegetable surplus. Expired items, meat, and dairy waste are locked out of Tier C."
+  },
+  {
+    "id": "CPCB-SWM-2016-R4",
+    "authority": "Ministry of Environment, Forest and Climate Change (MoEFCC) & CPCB",
+    "regulation": "Solid Waste Management Rules, 2016",
+    "clause": "Rule 4 - Duties of Waste Generators",
+    "title": "Source Segregation of Biodegradable Organic Waste",
+    "keywords": ["biodegradable", "segregation", "organic waste", "bulk waste generator", "cpcb", "landfill ban"],
+    "text": "All commercial establishments, restaurants, and hotels producing biodegradable organic waste must segregate waste at source into distinct streams (biodegradable, non-biodegradable recyclable, and domestic hazardous). Mixing spoiled food waste with plastics, metals, or hazardous chemicals is prohibited. Bulk waste generators must ensure organic waste is directed to bio-methanation or licensed composting units rather than municipal landfills.",
+    "legal_mandate": "Zero mixing of biodegradable organic waste with packaging or hazardous trash.",
+    "tier_rule": "FoodLoop enforces packaging segregation (Tier E) and certified industrial composting/biogas processing (Tier D) for bulk organic streams."
+  },
+  {
+    "id": "CPCB-SWM-2016-R14",
+    "authority": "Central Pollution Control Board (CPCB)",
+    "regulation": "Criteria for Certified Composting and Anaerobic Digestion Facilities",
+    "clause": "Schedule II - Standards for Processing Facilities",
+    "title": "Certification Standards for Compost and Biogas Units",
+    "keywords": ["certified facility", "compost standard", "anaerobic digestion", "biogas", "methane", "leachate"],
+    "text": "Composting and anaerobic digestion facilities receiving commercial organic food waste must possess valid State Pollution Control Board (SPCB) Consent to Operate (CTO). Facilities must meet leachate control, odor abatement, and temperature pathogen-reduction thresholds (minimum 55°C for 3 consecutive days during composting). Untreated open dumping of food waste is an environmental violation.",
+    "legal_mandate": "Disposal facilities must hold verified SPCB/CPCB environmental compliance certificates.",
+    "tier_rule": "FoodLoop requires platform admin validation of destination facility certificates before routing Tier D waste."
+  },
+  {
+    "id": "FSSA-2006-SEC59",
+    "authority": "Government of India",
+    "regulation": "Food Safety and Standards Act, 2006",
+    "clause": "Section 59 - Punishment for Unsafe Food",
+    "title": "Statutory Penalties for Willful Distribution of Unsafe Food",
+    "keywords": ["penalties", "unsafe food", "liability", "prosecution", "section 59", "fine", "imprisonment"],
+    "text": "Any person or enterprise that manufactures, stores, sells, distributes, or imports unsafe food—whether for human consumption or human-derived food products—faces criminal penalties. If such distribution does not cause injury, punishment includes fine up to ₹1,00,000; non-grievous injury incurs imprisonment up to 1 year and fine up to ₹3,00,000; grievous injury or fatality incurs imprisonment from 7 years to life imprisonment and minimum fine of ₹10,00,000.",
+    "legal_mandate": "Strict enterprise liability for distributing spoiled or expired stock for consumption.",
+    "tier_rule": "FoodLoop's hardcoded tier locks protect businesses by physically preventing expired/spoiled lots from being routed to human or livestock processors."
+  },
+  {
+    "id": "FSSAI-SURPLUS-2019-C6",
+    "authority": "FSSAI",
+    "regulation": "Food Safety and Standards (Recovery and Distribution of Surplus Food) Regulations, 2019",
+    "clause": "Regulation 6 - Labelling and Tamper-Evident Transportation",
+    "title": "Audit Trail and Tamper-Evident Transport Requirements",
+    "keywords": ["labelling", "transport", "traceability", "audit trail", "tamper-evident", "verification"],
+    "text": "Surplus and disposed food consignments must be traceable throughout their journey from source to destination. Consignments must be identified with batch details, dispatch timestamp, designated disposal route, and receiving facility. Tamper-evident transit documentation must be generated to verify that waste was delivered to certified recovery centers without unauthorized en-route diversion.",
+    "legal_mandate": "Traceability and verifiable delivery documentation required for commercial food waste dispatch.",
+    "tier_rule": "FoodLoop's SHA-256 hash-chained disposal records (FL-YYYY-XXXXX) fulfill Regulation 6's statutory requirement for verifiable, tamper-evident audit trails."
+  }
+]

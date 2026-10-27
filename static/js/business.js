@@ -6,23 +6,17 @@ const PLANTS = {};
 function plantCard(m, note = "") {
   if (!m) return `<p class="muted small">No eligible plant is listed for this route yet. We'll tell you when one is added.</p>`;
   PLANTS[m.id] = m;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
   return `<div class="card"><div class="row"><span class="li-ic">${icon("factory", 20)}</span>
     <div class="grow"><b>${esc(m.name)}</b> ${m.certified ? '<span class="chip ok">Certified</span>' : ""}
       <div class="muted small">${esc(m.address || "Address on request")}${m.distance_km != null ? ` · ${m.distance_km} km away` : ""}</div></div></div>
-    <div class="btn-row" style="margin-top:12px"><button class="btn secondary" data-loc="${m.id}">${icon("map-pin", 18)} View location</button>
-      <button class="btn secondary" data-doc="${m.id}">${icon("shield-check", 18)} Certificate</button></div>${note}</div>`;
+    <div class="btn-row" style="margin-top:12px">
+      <a class="btn secondary" target="_blank" rel="noopener" href="${mapsUrl}">${icon("navigation", 18)} Open in Maps</a>
+      <button class="btn secondary" data-doc="${m.id}">${icon("shield-check", 18)} Certificate</button>
+    </div>${note}</div>`;
 }
 function wirePlants(root) {
-  $$("[data-loc]", root).forEach((b) => b.onclick = () => plantMap(PLANTS[b.dataset.loc]));
   $$("[data-doc]", root).forEach((b) => b.onclick = () => plantDoc(PLANTS[b.dataset.doc]));
-}
-function plantMap(m) {
-  let mp;
-  sheet(`<h2>${esc(m.name)}</h2><p class="muted small">${esc(m.address || "")}</p><div class="map" id="pm" style="height:240px"></div><div class="gap-s"></div>
-    <a class="btn block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}">${icon("navigation", 18)} Open in Maps</a>`, (s) => {
-    mp = makeMap($("#pm", s), [m.lat, m.lng], 14);
-    if (mp) { L.marker([m.lat, m.lng], { icon: pin("#E8472F", "F") }).addTo(mp); setTimeout(() => mp.invalidateSize(), 60); }
-  }, () => mp && mp.remove());
 }
 function plantDoc(m) {
   sheet(`<h2>Certificate</h2><div class="gap-s"></div>
@@ -158,6 +152,15 @@ route("/b/home", { roles: BIZ, tabs: true, title: "Home" }, async (el) => {
       <div class="kpi"><div class="n">${h.records}</div><div class="l">disposal records</div></div>
       <div class="kpi"><div class="n">${h.planned}</div><div class="l">pickups on the way</div></div></div>
     <div class="gap"></div><a class="btn lime block" href="#/b/add" style="min-height:54px">${icon("plus", 22)} Add a lot</a>
+    <div class="card" style="margin-top:14px;background:linear-gradient(135deg, rgba(47,158,79,0.08), rgba(244,249,245,0.9));border:1px solid rgba(47,158,79,0.25)">
+      <div class="row between wrap" style="gap:8px">
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px">${icon("shield-check", 18)} FSSAI & Waste Copilot <span class="chip ok sm" style="font-size:10px;padding:2px 6px">AI / RAG</span></div>
+          <div class="small muted" style="margin-top:2px">Consult statutory RAG on food safety rules, swill feed bans & disposal laws.</div>
+        </div>
+        <a class="btn ghost sm" href="#/compliance" style="align-self:center">Ask Copilot →</a>
+      </div>
+    </div>
     ${Object.keys(h.by_tier).length ? `${section("Waiting by route")}<div class="card"><div class="row wrap">${Object.entries(h.by_tier).map(([t, x]) => `${tierChip(t)} <b>${x} kg</b>`).join(' &nbsp; ')}</div></div>` : ""}
     ${section("Recent pickups", `<a href="#/b/records">All records</a>`)}
     ${h.recent.length ? h.recent.map(pickupCard).join("") : empty("No pickups yet", "Add your expired or surplus stock. We'll match it to a certified facility and plan the pickup.", "capsicum")}
@@ -169,39 +172,44 @@ route("/b/home", { roles: BIZ, tabs: true, title: "Home" }, async (el) => {
 
 route("/b/add", { roles: BIZ, tabs: true, title: "Add a lot" }, (el) => {
   const cat = S.cat; const items = cat.items.filter((i) => !i.fixed);
-  let item = items[0].key, cond = "fresh", map, layer;
+  let item = items[0].key, cond = "spoiled";
   const today = new Date().toISOString().slice(0, 10);
   el.innerHTML = `<div class="lbl">What is it?</div>${tilesHTML(items, item)}<div class="gap"></div>
     <div id="condw"><div class="lbl">Condition</div>${segHTML("cond", cat.conditions.map((c) => [c, COND_LABEL[c]]), cond)}<div class="gap"></div></div>
     <div class="grid2"><div class="field"><label for="qty">Quantity (kg)</label><input id="qty" type="number" inputmode="decimal" min="1" step="0.5" placeholder="e.g. 40"></div>
     <div class="field" id="expf"><label for="exp">Expiry date</label><input id="exp" type="date"><div class="hint" id="exph"></div></div></div>
-    <div id="prev"></div><div id="mapw" style="display:none"><div class="map" id="map"></div></div>
+    <div id="prev"></div>
     <button class="btn block" id="add" disabled style="min-height:54px">${icon("check", 22)} Add lot</button>`;
-  const sync = () => { const it = items.find((i) => i.key === item); $("#expf", el).style.display = it.dated ? "" : "none"; };
+  const sync = () => {
+    const it = items.find((i) => i.key === item);
+    $("#expf", el).style.display = it.dated ? "" : "none";
+    $("#exph", el).textContent = cond === "fresh" ? "Fresh food is only collected if it has passed its expiry date." : "Date printed on pack.";
+  };
   const preview = debounce(async () => {
     const it = items.find((i) => i.key === item), qty = +v("qty", el), exp = v("exp", el);
     const ready = qty > 0 && (!it.dated || exp);
     $("#add", el).disabled = !ready;
-    if (!ready) { $("#prev", el).innerHTML = ""; $("#mapw", el).style.display = "none"; return; }
+    if (!ready) { $("#prev", el).innerHTML = ""; return; }
     try {
-      const r = await post("/api/business/preview", { item, condition: cond, qty_kg: qty, expiry: it.dated ? exp : null });
+      const [r, comp] = await Promise.all([
+        post("/api/business/preview", { item, condition: cond, qty_kg: qty, expiry: it.dated ? exp : null }),
+        post("/api/compliance/check", { item, condition: cond, expiry: it.dated ? exp : null }).catch(() => null)
+      ]);
+      const compHTML = comp ? `
+        <div class="banner ${comp.status === 'COMPLIANT' ? 'ok' : 'info'}" style="margin:10px 0 0;padding:8px 10px;font-size:12px">
+          ${icon(comp.status === 'COMPLIANT' ? "badge-check" : "shield-check", 16)}
+          <div><b>FSSAI Regulatory Audit: ${comp.status === 'COMPLIANT' ? 'Verified Safe Route' : 'Mandatory Routing Law Applied'}</b>
+          <div class="tiny muted">${comp.citations && comp.citations[0] ? esc(comp.citations[0].authority + ' - ' + comp.citations[0].clause) : 'FSSAI Statutory Rules 2019'} · <a href="#/compliance">Consult Copilot</a></div></div>
+        </div>` : '';
       $("#prev", el).innerHTML = `<div class="card"><div class="row wrap">${tierChip(r.tier)} ${lockChips(r.locked)}</div>
-        <p style="margin:10px 0 4px"><b>${esc(r.route)}</b></p><p class="muted small" style="margin:0">${esc(r.reason)}</p></div>
+        <p style="margin:10px 0 4px"><b>${esc(r.route)}</b></p><p class="muted small" style="margin:0">${esc(r.reason)}</p>${compHTML}</div>
         <div class="lbl" style="margin-top:14px">Where it will go</div>${plantCard(r.match)}`;
       wirePlants($("#prev", el));
-      drawMap(r.match ? [r.match] : []);
-    } catch (e) { $("#prev", el).innerHTML = `<div class="banner bad">${icon("triangle-alert", 20)}<div>${esc(e.message)}</div></div>`; }
+    } catch (e) {
+      $("#prev", el).innerHTML = `<div class="banner warn">${icon("triangle-alert", 20)}<div><b>${esc(e.message)}</b>
+        <div class="small muted" style="margin-top:4px">Tip: FoodLoop is a waste disposal platform. If this is food waste, select <b>Overripe</b> (pulp/pickling), <b>Bruised</b> (animal feed), or <b>Spoiled</b> (compost/biogas). Fresh food is only accepted if it has already passed its expiry date.</div></div></div>`;
+    }
   }, 350);
-  const drawMap = (ms) => {
-    const org = S.user.org; const w = $("#mapw", el);
-    if (!ms.length) { w.style.display = "none"; return; }
-    w.style.display = "";
-    if (!map) { const home = [ms[0].lat, ms[0].lng]; map = makeMap($("#map", el), home, 10); layer = map && L.layerGroup().addTo(map); }
-    if (!map) return;
-    layer.clearLayers(); const pts = [];
-    ms.forEach((m, i) => { L.marker([m.lat, m.lng], { icon: pin("#2F9E4F", "F") }).addTo(layer).bindPopup(esc(m.name)); pts.push([m.lat, m.lng]); });
-    map.invalidateSize(); map.fitBounds(pts, { padding: [30, 30], maxZoom: 13 });
-  };
   wireTiles(el, (k) => { item = k; sync(); preview(); });
   wireSeg($("#cond", el), (k) => { cond = k; preview(); });
   $("#qty", el).oninput = preview; $("#exp", el).oninput = preview;
@@ -218,7 +226,7 @@ route("/b/add", { roles: BIZ, tabs: true, title: "Add a lot" }, (el) => {
       $("#an", s).onclick = () => { close(); render(); }; $("#vl", s).onclick = () => { close(); go("/b/lots"); }; }, () => go("/b/lots"));
   });
   sync();
-  return () => map && map.remove();
+  return () => {};
 });
 
 route("/b/lots", { roles: BIZ, tabs: true, title: "Your lots" }, async (el) => {
