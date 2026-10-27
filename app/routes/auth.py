@@ -80,7 +80,7 @@ def signup(b: SignupIn, request: Request, db=Depends(get_db)):
         if b.role == "hub":
             inv = db.scalar(select(Invite).where(
                 Invite.code == (b.invite_code or "").strip().upper()))
-            if (not inv or inv.role != "hub" or inv.used_by
+            if (not inv or inv.role != "hub"
                     or inv.expires_at < utcnow()):
                 raise HTTPException(
                     422, "This invite code is invalid or has expired.")
@@ -98,8 +98,8 @@ def signup(b: SignupIn, request: Request, db=Depends(get_db)):
             u.org_id = org.id
         db.add(u)
         db.flush()
-        if b.role == "hub":
-            inv.used_by = u.id
+        if b.role == "hub":              # a code works until it expires
+            inv.used_by, inv.uses = u.id, (inv.uses or 0) + 1
         else:
             notify_role(db, "admin", "New business to verify",
                         f"{org.name} signed up.", kind="approval")
@@ -119,7 +119,7 @@ def invite_info(code: str, request: Request, db=Depends(get_db)):
     rate_limit("invite:" + _ip(request), 30, 600)
     inv = db.scalar(select(Invite).where(
         Invite.code == code.strip().upper()))
-    if not inv or inv.used_by or inv.expires_at < utcnow():
+    if not inv or inv.expires_at < utcnow():
         raise HTTPException(
             404, "This invite code is invalid or has expired.")
     org = db.get(Org, inv.org_id) if inv.org_id else None

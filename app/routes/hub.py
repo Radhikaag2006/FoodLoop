@@ -55,8 +55,8 @@ def plan(b: PlanIn, db=Depends(get_db), u=Depends(hub)):
     # big groups are cut to the biggest vehicle, then each run is offered
     # to the nearest collector whose vehicle can carry it
     created, waiting = plan_pickups(db, b.min_kg, D.max_capacity(db))
+    D.dispatch_new(db, created)          # rules, solver batch or shadow
     for p in created:
-        D.assign_run(db, p)
         T.event(db, p.id, "planned", u.id)
     for p in created:
         for oid in {ln.org_id for ln in db.scalars(select(PickupLine)
@@ -78,9 +78,12 @@ def _run_view(db, p, viewer):
         fare["total_paise"], fare["total"] = a.fare_paise, round(
             a.fare_paise / 100, 2)
     d = pickup_dict(db, p)
+    pending = bool(a and a.pending)
     d.update(assigned_to=db.get(User, owner).name if owner else None,
-             mine=owner == viewer.id, open=owner is None, fare=fare,
-             accepted=D.is_accepted(db, p))
+             mine=owner == viewer.id, open=owner is None and not pending,
+             pending=pending, fare=fare, accepted=D.is_accepted(db, p))
+    if viewer.role == "admin" and a:           # admin only: why this driver
+        d["why"] = a.reason
     return d
 
 
@@ -98,6 +101,8 @@ def week(db=Depends(get_db), u=Depends(hub)):
         if owner not in (None, u.id):
             continue
         v = _run_view(db, p, u)
+        if v["pending"]:                       # not given out yet
+            continue
         if not v["accepted"]:
             offers.append(v)
             continue
@@ -156,6 +161,8 @@ def runs(status: str = "open", db=Depends(get_db), u=Depends(hub)):
     rows = [_run_view(db, p, u) for p in db.scalars(st.limit(60))]
     has_vehicle = db.scalar(select(CollectorProfile.id).where(
         CollectorProfile.user_id == u.id))
+    if u.role == "hub":
+        rows = [r for r in rows if not r["pending"]]
     if u.role == "hub" and has_vehicle:      # only mine, plus open ones
         rows = [r for r in rows if r["mine"] or r["open"]]
     return rows
@@ -231,6 +238,7 @@ def collect(pid: int, db=Depends(get_db), u=Depends(hub)):
         db.add(PickupSchedule(pickup_id=pid, collector_id=owner or u.id,
                               starts_at=utcnow()))
     p.status = "collected"
+    D.log_mark(db, pid, owner or u.id, "started_at")
     T.event(db, pid, "collected", u.id)
     for oid in {ln.org_id for ln in db.scalars(select(PickupLine).where(
             PickupLine.pickup_id == p.id))}:

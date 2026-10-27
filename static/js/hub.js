@@ -19,7 +19,7 @@ route("/h/pool", { roles: HUBR, tabs: true, title: "Pool" }, async (el) => {
     const r = await post("/api/hub/plan", { min_kg: +v("mk", el) });
     sheet(`<div class="center"><div class="success-burst ${r.created.length ? "" : "bad"}">${icon(r.created.length ? "truck" : "clock", 40)}</div>
       <h2>${r.created.length ? `${r.created.length} run${r.created.length > 1 ? "s" : ""} planned` : "No runs yet"}</h2></div>
-      ${r.created.map((p) => `<div class="kv"><span>${esc(p.facility)}<br><span class="tiny faint">${p.assigned_to ? "To " + esc(p.assigned_to) : "No collector fits, open to all"}</span></span><b>${kg(p.expected_kg)} · ${p.route_km} km</b></div>`).join("")}
+      ${r.created.map((p) => `<div class="kv"><span>${esc(p.facility)}<br><span class="tiny faint">${p.assigned_to ? "To " + esc(p.assigned_to) : p.pending ? "Waiting for the next dispatch batch" : "No collector fits, open to all"}</span></span><b>${kg(p.expected_kg)} · ${p.route_km} km</b></div>`).join("")}
       ${r.waiting.length ? `<p class="small muted" style="margin-top:12px"><b>Still too small:</b> ${r.waiting.map((w) => `${esc(w.facility)} (${w.kg} of ${w.need} kg)`).join(", ")}</p>` : ""}
       <div class="gap"></div><button class="btn block" id="go">${r.created.length ? "See runs" : "OK"}</button>`, (s, close) => {
       $("#go", s).onclick = () => { close(); if (r.created.length) go("/h/runs"); else render(); }; });

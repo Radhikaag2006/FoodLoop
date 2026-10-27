@@ -75,7 +75,8 @@ class Invite(Base):
     note: Mapped[str] = mapped_column(String(80), default="")
     created_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
     used_by: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("users.id"), nullable=True)
+        ForeignKey("users.id"), nullable=True)   # the latest person to join
+    uses: Mapped[int] = mapped_column(Integer, default=0)
     expires_at: Mapped[datetime] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
 
@@ -261,6 +262,13 @@ class RunAssignment(Base):
     fare_paise: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     accepted_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime, nullable=True)       # NULL = offered, not yet accepted
+    pending: Mapped[bool] = mapped_column(
+        Boolean, default=False)        # waiting for the next dispatch batch
+    reason: Mapped[str] = mapped_column(Text, default="")  # why this driver
+    planned_km: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    shadow_driver: Mapped[Optional[int]] = mapped_column(
+        Integer, nullable=True)        # shadow mode: the solver's pick
+    shadow_km: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     assigned_at: Mapped[datetime] = mapped_column(DateTime, default=now)
 
 
@@ -378,3 +386,32 @@ class Record(Base):
     prev_hash: Mapped[str] = mapped_column(String(64), default="")
     hash: Mapped[str] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+
+
+class TripLog(Base):
+    """One row per offer of a run to a driver: what was planned and what
+    happened. Logged only; nothing reads it yet (data for later analysis)."""
+    __tablename__ = "trip_log"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    run_id: Mapped[int] = mapped_column(ForeignKey("pickups.id"), index=True)
+    driver_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id"), nullable=True)
+    planned_km: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    planned_minutes: Mapped[Optional[float]] = mapped_column(
+        Float, nullable=True)
+    offered_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+    accepted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True)
+    declined_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True)
+    started_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True)
+    closed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True)
+    actual_minutes: Mapped[Optional[float]] = mapped_column(
+        Float, nullable=True)
+    stops: Mapped[int] = mapped_column(Integer, default=0)
+    expected_kg: Mapped[float] = mapped_column(Float, default=0.0)
+    hub_kg: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    hour_of_day: Mapped[int] = mapped_column(Integer, default=0)
+    weekday: Mapped[int] = mapped_column(Integer, default=0)

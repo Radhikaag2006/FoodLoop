@@ -172,10 +172,22 @@ def invite(b: InvIn, db=Depends(get_db), u=Depends(adm)):
 @router.get("/invites")
 def invites(db=Depends(get_db), u=Depends(adm)):
     rows = db.scalars(select(Invite).where(
-        Invite.role == "hub", Invite.used_by.is_(None),
-        Invite.expires_at > utcnow())).all()
+        Invite.role == "hub", Invite.expires_at > utcnow())
+        .order_by(Invite.id.desc())).all()
     return [{"id": i.id, "code": i.code, "note": i.note,
-             "expires": iso(i.expires_at)} for i in rows]
+             "uses": i.uses or 0, "expires": iso(i.expires_at)}
+            for i in rows]
+
+
+@router.delete("/invites/{iid}")
+def revoke_invite(iid: int, db=Depends(get_db), u=Depends(adm)):
+    """Stop a code from working. People who already joined keep their accounts."""
+    inv = db.get(Invite, iid)
+    if not inv or inv.role != "hub":
+        raise HTTPException(404, "Not found.")
+    inv.expires_at = utcnow() - timedelta(seconds=1)
+    db.commit()
+    return {"ok": True}
 
 
 @router.get("/users")
@@ -220,3 +232,33 @@ def records(db=Depends(get_db), u=Depends(adm)):
     rows = db.scalars(select(Record).order_by(Record.id.desc())
                       .limit(50)).all()
     return [{"code": r.code, "at": iso(r.created_at)} for r in rows]
+
+
+@router.post("/dispatch/run")
+def dispatch_run(db=Depends(get_db), u=Depends(adm)):
+    """Give out every waiting run now, without waiting for the batch."""
+    from .. import dispatch as D
+    return D.assign_batch(db, force=True)
+
+
+@router.get("/dispatch")
+def dispatch_log(db=Depends(get_db), u=Depends(adm)):
+    """How runs were given out, with the reason, and (in shadow mode) what
+    the solver would have done. Admin only; no business details."""
+    from .. import config as C
+    from ..models import RunAssignment
+    rows = db.scalars(select(RunAssignment)
+                      .order_by(RunAssignment.id.desc()).limit(30)).all()
+    names = {x.id: x.name for x in db.scalars(select(User))}
+    out = [{"run": a.pickup_id, "pending": bool(a.pending),
+            "driver": names.get(a.collector_id), "km": a.planned_km,
+            "why": a.reason, "shadow_driver": names.get(a.shadow_driver),
+            "shadow_km": a.shadow_km} for a in rows]
+    both = [r for r in out if r["km"] is not None
+            and r["shadow_km"] is not None]
+    return {"mode": C.DISPATCH_MODE, "runs": out,
+            "pending": sum(1 for r in out if r["pending"]),
+            "compare": {"runs": len(both),
+                        "rules_km": round(sum(r["km"] for r in both), 1),
+                        "solver_km": round(sum(r["shadow_km"]
+                                               for r in both), 1)}}

@@ -4,6 +4,7 @@ from math import radians, sin, cos, asin, sqrt
 from sqlalchemy import select
 
 from .models import Facility, Org, Pickup, PickupLine, Lot
+from . import config as C
 from .config import CLUB_MAX_KM, MIN_PICKUP_KG
 from .tiers import TIERS
 
@@ -93,9 +94,25 @@ def split_by_capacity(rows, fac, cap_kg):
     return loads
 
 
+def _improve_order(stops, fac):
+    """2-opt over the nearest-neighbour order (solver mode); returns the
+    stops in the better order and the new km (plant -> stops -> plant)."""
+    from .optimizer import order_stops
+    from .travel import Travel
+    pts = [(s["lat"], s["lng"]) for s in stops]
+    plant = (fac.lat, fac.lng)
+    order = order_stops(pts, plant, Travel(pts + [plant]))
+    stops = [stops[i] for i in order]
+    path = [plant] + [(s["lat"], s["lng"]) for s in stops]
+    km = sum(haversine(a[0], a[1], b[0], b[1]) for a, b in zip(path, path[1:]))
+    return stops, km, path[-1]
+
+
 def _make_run(db, fac, rows):
     orgs = {r[3].id: r[3] for r in rows}.values()
     stops, km, last = _order_stops(orgs, (fac.lat, fac.lng))
+    if C.DISPATCH_MODE == "solver" and len(stops) > 2:
+        stops, km, last = _improve_order(stops, fac)
     per = {}
     for r in rows:
         per[r[3].id] = per.get(r[3].id, 0) + r[2]

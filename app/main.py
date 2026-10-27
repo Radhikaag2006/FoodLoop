@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -16,10 +17,33 @@ from .seed import init
 logging.basicConfig(level=logging.INFO)
 
 
+async def _dispatch_loop():
+    """Close the batch window: hand out waiting runs every few seconds."""
+    from .db import SessionLocal
+    from . import dispatch
+
+    def once():
+        db = SessionLocal()
+        try:
+            dispatch.assign_batch(db)
+        finally:
+            db.close()
+
+    while True:
+        await asyncio.sleep(max(5, min(30, C.DISPATCH_BATCH_SECONDS)))
+        try:
+            await asyncio.to_thread(once)
+        except Exception:
+            logging.exception("dispatch batch failed")
+
+
 @asynccontextmanager
 async def lifespan(app):
     init()
+    task = asyncio.create_task(_dispatch_loop())         if C.DISPATCH_MODE == "solver" else None
     yield
+    if task:
+        task.cancel()
 
 
 app = FastAPI(title="FoodLoop", lifespan=lifespan, docs_url=None,

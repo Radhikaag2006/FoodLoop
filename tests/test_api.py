@@ -64,9 +64,21 @@ def test_hub_invite_signup(anon):
     body = {"role": "hub", "name": "New Hub", "phone": "9444444444",
             "password": "Strong123", "invite_code": code}
     assert anon.post("/api/auth/signup", json=body).status_code == 200
+    # a code is reusable until it expires: a second driver can join too
     anon.cookies.clear()
     body["phone"] = "9555555555"
+    assert anon.post("/api/auth/signup", json=body).status_code == 200
+    login(anon, ADMIN)
+    row = next(i for i in anon.get("/api/admin/invites").json()
+               if i["code"] == code)
+    assert row["uses"] == 2
+    # revoking stops new sign-ups, but people already in keep their accounts
+    assert anon.delete(f"/api/admin/invites/{row['id']}").status_code == 200
+    assert all(i["code"] != code for i in anon.get("/api/admin/invites").json())
+    anon.cookies.clear()
+    body["phone"] = "9666666666"
     assert anon.post("/api/auth/signup", json=body).status_code == 422
+    assert anon.get(f"/api/auth/invite/{code}").status_code == 404
 
 
 def test_business_and_unverified_gate(anon):

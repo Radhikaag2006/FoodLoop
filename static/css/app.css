@@ -374,3 +374,14 @@ select { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns
 .plan-feats li { display: flex; gap: 9px; align-items: flex-start; }
 .plan-feats .ic { color: var(--leaf); margin-top: 2px; }
 .plan-cta { margin-top: auto; padding-top: 6px; }
+
+/* language switch */
+.lang-btn { height: 34px; padding: 0 12px; border-radius: 17px; border: 1.5px solid var(--line, #D5E0D2);
+  background: #fff; color: var(--ink); font: 700 14px/1 var(--body); cursor: pointer; flex: none; margin-right: 4px; }
+.lang-btn:hover { background: #E7EFE5; }
+.lang-btn.float { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: 14px; z-index: 30; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+/* Devanagari needs a font that has it; DM Sans does not */
+html[lang="hi"] { --display: "Bricolage", "DM Sans", "Noto Sans Devanagari", "Nirmala UI", "Mangal", system-ui, sans-serif;
+  --body: "DM Sans", "Noto Sans Devanagari", "Nirmala UI", "Mangal", system-ui, -apple-system, "Segoe UI", sans-serif; }
+html[lang="hi"] body { line-height: 1.6; }
+html[lang="hi"] .tabbar .tab span { font-size: 11px; }

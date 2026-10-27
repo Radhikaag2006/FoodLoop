@@ -135,19 +135,26 @@ def seed_demo():
         db.close()
 
 
+NEW_COLUMNS = [      # (table, column, DDL type): create_all never adds columns
+    ("invoices", "breakdown", "TEXT DEFAULT '[]'"),
+    ("invites", "uses", "INTEGER DEFAULT 0"),
+    ("run_assignments", "accepted_at", "TIMESTAMP"),
+    ("run_assignments", "pending", "BOOLEAN DEFAULT FALSE"),
+    ("run_assignments", "reason", "TEXT DEFAULT ''"),
+    ("run_assignments", "planned_km", "FLOAT"),
+    ("run_assignments", "shadow_driver", "INTEGER"),
+    ("run_assignments", "shadow_km", "FLOAT"),
+]
+
+
 def ensure_columns():
     """create_all adds tables but never columns: add the ones we grew."""
     from sqlalchemy import inspect, text
-    have = {c["name"] for c in inspect(engine).get_columns("invoices")}
-    if "breakdown" not in have:
-        with engine.begin() as cx:
-            cx.execute(text(
-                "ALTER TABLE invoices ADD COLUMN breakdown TEXT DEFAULT '[]'"))
-    have = {c["name"] for c in inspect(engine).get_columns("run_assignments")}
-    if "accepted_at" not in have:
-        with engine.begin() as cx:
-            cx.execute(text(
-                "ALTER TABLE run_assignments ADD COLUMN accepted_at DATETIME"))
+    for table, col, ddl in NEW_COLUMNS:
+        have = {c["name"] for c in inspect(engine).get_columns(table)}
+        if col not in have:
+            with engine.begin() as cx:
+                cx.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}"))
 
 
 def init():
