@@ -1,6 +1,6 @@
 /* Minimal offline shell: cache static assets, always go to network for data. */
-const V = "fl-v18";
-const SHELL = ["/", "/static/css/app.css?v=14"];
+const V = "fl-v19";
+const SHELL = ["/", "/static/css/app.css?v=15"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(V).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });

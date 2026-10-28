@@ -258,6 +258,7 @@ async function render() {
   const bell = $("#tb-bell");
   if (bell) bell.onclick = () => go("/notifications");
   if (!o.bare) view.innerHTML = skeleton();
+  if (typeof chatMount === "function") { if (u && u.role === "business" && o.tabs) chatMount(); else $("#chat-fab")?.remove(); }
   try {
     const cleanup = await r.fn(view, params);
     if (typeof cleanup === "function") S.cleanup = cleanup;

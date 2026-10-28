@@ -271,6 +271,25 @@ Object.assign(I18N.hi, {
   "A new time will be confirmed.": "नया समय पक्का किया जाएगा।",
 });
 
+Object.assign(I18N.hi, {
+  "FoodLoop assistant": "FoodLoop सहायक", "Ask FoodLoop": "FoodLoop से पूछें", "Ask FoodLoop assistant": "FoodLoop सहायक से पूछें", "Here to help": "मदद के लिए हाज़िर",
+  "Type your question…": "अपना सवाल लिखें…", "Your question": "आपका सवाल", "Send": "भेजें",
+  "How do I add a lot?": "लॉट कैसे जोड़ूँ?", "When will my pickup come?": "मेरा पिकअप कब आएगा?", "How do I pay?": "भुगतान कैसे करूँ?", "Can expired food go to cattle feed?": "क्या एक्सपायर्ड खाना पशु चारे में जा सकता है?",
+  "See my lots": "मेरे लॉट देखें", "Open Records": "रिकॉर्ड खोलें", "Open Account": "खाता खोलें", "Add a lot": "लॉट जोड़ें", "Plan and billing": "प्लान और बिल",
+  "Hi! I'm the FoodLoop assistant. Ask me about adding lots, pickups, tracking, payments or food-safety rules.": "नमस्ते! मैं FoodLoop सहायक हूँ। लॉट जोड़ने, पिकअप, ट्रैकिंग, भुगतान या खाद्य सुरक्षा के नियमों के बारे में मुझसे पूछें।",
+  "Sorry, I couldn't reach the assistant right now. Check your internet and try again.": "माफ़ कीजिए, अभी सहायक तक नहीं पहुँच सका। इंटरनेट जाँचकर फिर कोशिश करें।",
+  "To add expired or surplus food, tap the green + Add lot button. Choose what it is, its condition, the weight and the expiry date. FoodLoop then picks the right route and the best nearby certified plant.": "एक्सपायर्ड या बचा खाना जोड़ने के लिए हरे रंग का + “लॉट जोड़ें” बटन दबाएँ। बताएँ कि वह क्या है, उसकी हालत, वज़न और एक्सपायरी की तारीख़। इसके बाद FoodLoop सही रास्ता और पास का सबसे अच्छा प्रमाणित प्लांट चुनता है।",
+  "A collector plans a run once enough lots are waiting for the same plant. You get a notification with the pickup time and the collector's name and number. You can also see it under Lots.": "जब एक ही प्लांट के लिए काफ़ी लॉट जमा हो जाते हैं, कलेक्टर ट्रिप बनाता है। आपको पिकअप के समय और कलेक्टर के नाम व नंबर की सूचना मिलती है। आप इसे “लॉट” में भी देख सकते हैं।",
+  "Every lot has a Tracking ID and QR code. Open the lot and tap Track this order to see where it is, from pickup to the plant.": "हर लॉट की एक ट्रैकिंग आईडी और QR कोड होता है। लॉट खोलकर “इस ऑर्डर को ट्रैक करें” दबाएँ, ताकि पिकअप से प्लांट तक वह कहाँ है, पता चले।",
+  "Your first pickups are free. After that you can pay per pickup, right after it is done, or choose a monthly plan. You can pay by UPI, card or net banking.": "आपके पहले पिकअप मुफ़्त हैं। उसके बाद आप हर पिकअप के तुरंत बाद चुका सकते हैं या मासिक प्लान ले सकते हैं। भुगतान UPI, कार्ड या नेट बैंकिंग से हो सकता है।",
+  "After a pickup is weighed and closed, you get a tamper-evident disposal record with a QR code and a PDF. Share it with auditors or customers. Find it under Records.": "पिकअप तुलकर पूरा होने के बाद आपको QR कोड और PDF के साथ छेड़छाड़-रोधी निपटान रिकॉर्ड मिलता है। इसे ऑडिटर या ग्राहकों को दिखाएँ। यह “रिकॉर्ड” में मिलेगा।",
+  "An admin checks your business before pickups start. Add your FSSAI licence number in Account to speed this up. You can add lots while you wait.": "पिकअप शुरू होने से पहले एडमिन आपके कारोबार की जाँच करता है। जल्दी जाँच के लिए खाते में अपना FSSAI लाइसेंस नंबर डालें। इंतज़ार के दौरान आप लॉट जोड़ सकते हैं।",
+  "FoodLoop only takes food that is already waste: expired, spoiled or damaged food, plus empty packaging. Fresh food that is still in date is not accepted. Expired and spoiled food goes only to certified compost or biogas plants.": "FoodLoop सिर्फ़ वही खाना लेता है जो पहले से कचरा है: एक्सपायर्ड, सड़ा या ख़राब खाना और ख़ाली पैकेजिंग। एक्सपायरी से पहले का ताज़ा खाना नहीं लिया जाता। एक्सपायर्ड और सड़ा खाना सिर्फ़ प्रमाणित कंपोस्ट या बायोगैस प्लांट में जाता है।",
+  "Your load is weighed at the hub and again at the plant. If the two weights differ by more than 5%, the record shows a mismatch flag.": "आपका माल हब पर और फिर प्लांट पर तौला जाता है। अगर दोनों वज़न में 5% से ज़्यादा अंतर हो, तो रिकॉर्ड में अंतर का निशान दिखता है।",
+  "Open Lots, tap the lot and choose Remove this lot. This works only while the lot is not in a pickup. To fix a weight or date, remove the lot and add it again.": "“लॉट” खोलें, लॉट पर दबाएँ और “यह लॉट हटाएँ” चुनें। यह तभी होता है जब लॉट किसी पिकअप में न हो। वज़न या तारीख़ सुधारनी हो तो लॉट हटाकर दोबारा जोड़ें।",
+  "Tap the हिंदी / English button at the top of the screen to change the language at any time.": "भाषा बदलने के लिए स्क्रीन के ऊपर “हिंदी / English” बटन कभी भी दबाएँ।",
+});
+
 /* text with numbers or names in it */
 const _R = (re, rep) => I18N.hiRe.push([re, rep]);
 Object.assign(I18N.hi, {
