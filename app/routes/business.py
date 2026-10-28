@@ -244,17 +244,17 @@ def profile(b: ProfileIn, db=Depends(get_db), u=Depends(biz)):
 def report(db=Depends(get_db), u=Depends(biz)):
     ids = set(db.scalars(select(PickupLine.pickup_id).where(
         PickupLine.org_id == u.org_id)))
-    out = [["record", "closed", "facility", "tier", "kg_from_you",
-            "weights_match"]]
-    for p in db.scalars(select(Pickup).where(Pickup.status == "closed")
+    out = [["record", "pickup", "status", "closed", "facility", "tier",
+            "kg_from_you", "weights_match"]]
+    for p in db.scalars(select(Pickup).where(Pickup.id.in_(ids))
                         .order_by(Pickup.id)):
-        if p.id not in ids:
-            continue
         d = pickup_dict(db, p)
         for ln in db.scalars(select(PickupLine).where(
                 PickupLine.pickup_id == p.id,
                 PickupLine.org_id == u.org_id)):
-            out.append([d["record"], local_day(p.closed_at),
+            out.append([d["record"], p.id, p.status,
+                        local_day(p.closed_at) if p.closed_at else "",
                         d["facility"], ln.tier, round(ln.kg, 2),
-                        "no" if p.mismatch else "yes"])
+                        ("no" if p.mismatch else "yes")
+                        if p.status == "closed" else ""])
     return csv_response(out, "foodloop-disposal-report.csv")

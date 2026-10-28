@@ -1,3 +1,6 @@
+import csv
+import io
+
 from conftest import login
 
 BIZ, BIZ2, HUB = "9000000005", "9000000006", "9000000007"
@@ -111,6 +114,15 @@ def test_full_pickup_chain_and_report(anon):
                      json={"hub_kg": 1, "facility_kg": 1}
                      ).status_code == 409
     anon.post(f"/api/hub/runs/{r['id']}/collect")
+    login(anon, BIZ)
+    report = list(csv.reader(io.StringIO(
+        anon.get("/api/business/report.csv").text)))
+    assert report[0] == [
+        "record", "pickup", "status", "closed", "facility", "tier",
+        "kg_from_you", "weights_match"]
+    assert any(row[1] == str(r["id"]) and row[2] == "collected"
+               and row[4] and row[6] for row in report[1:])
+    login(anon, HUB)
     done = anon.post(f"/api/hub/runs/{r['id']}/close", json={
         "hub_kg": r["expected_kg"], "facility_kg": r["expected_kg"]}
     ).json()
@@ -120,8 +132,10 @@ def test_full_pickup_chain_and_report(anon):
     pdf = anon.get(f"/api/records/{done['record']}/pdf")
     assert pdf.content[:4] == b"%PDF"
     login(anon, BIZ)
-    csv = anon.get("/api/business/report.csv").text
-    assert csv.startswith("record,closed")
+    report = list(csv.reader(io.StringIO(
+        anon.get("/api/business/report.csv").text)))
+    assert any(row[0] == done["record"] and row[1] == str(r["id"])
+               and row[2] == "closed" for row in report[1:])
 
 
 def test_lot_and_pickup_details(anon):
