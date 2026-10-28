@@ -44,6 +44,17 @@
     "tier_rule": "Tier C (Feed) is permitted ONLY for non-expired, vegetarian bakery, grain, fruit, and vegetable surplus. Expired items, meat, and dairy waste are locked out of Tier C."
   },
   {
+    "id": "FSSAI-FEED-GAUSHALA-ROTI",
+    "authority": "FSSAI & Department of Animal Husbandry (DAHD)",
+    "regulation": "Advisory on Safe Utilization of Vegetarian Catering Surplus for Livestock",
+    "clause": "Clause 4.2 - Cereal, Bakery, and Roti Donation to Bovine Shelters (Gaushalas)",
+    "title": "Donation of Bread, Roti, and Grain Residues to Gaushalas and Cattle Shelters",
+    "keywords": ["roti", "rotis", "chapati", "chapatis", "phulka", "gaushala", "goshala", "cow", "cows", "cattle", "bovine", "bread", "wheat", "atta", "grains", "langar", "temple", "prasadam"],
+    "text": "Clean, mold-free, unexpired vegetarian cereal products—including dry rotis, chapatis, bread surplus, unfermented boiled grains, and clean vegetable peels—are legally PERMITTED to be supplied to registered Gaushalas (cattle shelters) and livestock feed mills under Tier C. However, rotis showing any signs of fungal mold (Rhizopus or Aspergillus producing aflatoxins), wet rotis stored in humid containers exceeding 24 hours, or rotis mixed with spicy/oily cooked curries, dal, or non-vegetarian catering swill are strictly prohibited from animal feed due to severe rumen acidosis and mycotoxin risks. Moldy or spoiled rotis must be diverted to Tier D (compost/biogas).",
+    "legal_mandate": "Clean, vegetarian, mold-free rotis and bakery surplus can be fed to cows/gaushalas; moldy or oily cooked waste is strictly banned.",
+    "tier_rule": "FoodLoop approves clean dry rotis/chapatis for Tier C (Gaushala / Cattle Feed); flags moldy or curry-soaked stock for Tier D (Biogas / Compost)."
+  },
+  {
     "id": "CPCB-SWM-2016-R4",
     "authority": "Ministry of Environment, Forest and Climate Change (MoEFCC) & CPCB",
     "regulation": "Solid Waste Management Rules, 2016",
@@ -86,5 +97,49 @@
     "text": "Surplus and disposed food consignments must be traceable throughout their journey from source to destination. Consignments must be identified with batch details, dispatch timestamp, designated disposal route, and receiving facility. Tamper-evident transit documentation must be generated to verify that waste was delivered to certified recovery centers without unauthorized en-route diversion.",
     "legal_mandate": "Traceability and verifiable delivery documentation required for commercial food waste dispatch.",
     "tier_rule": "FoodLoop's SHA-256 hash-chained disposal records (FL-YYYY-XXXXX) fulfill Regulation 6's statutory requirement for verifiable, tamper-evident audit trails."
+  },
+  {
+    "id": "FSSAI-RUCO-2018-UCO",
+    "authority": "FSSAI",
+    "regulation": "Repurpose Used Cooking Oil (RUCO) Guidelines & Regulation",
+    "clause": "Direction under Section 16(5) - Disposal of Used Cooking Oil",
+    "title": "Mandatory Collection and Biodiesel Conversion of Used Cooking Oil",
+    "keywords": ["used cooking oil", "uco", "ruco", "fryer", "biodiesel", "total polar compounds", "drain dumping"],
+    "text": "Cooking oil with Total Polar Compounds (TPC) exceeding 25% is classified as hazardous to cardiovascular health and strictly illegal to reuse or blend back into human food chains. Any Food Business Operator consuming more than 50 litres of edible oil per day must maintain an oil purchase/disposal logbook and hand over used oil exclusively to FSSAI-authorized biodiesel aggregators. Discharging used cooking oil into municipal drains or open land is strictly prohibited.",
+    "legal_mandate": "Degraded cooking oil (TPC > 25%) cannot be reused for food or poured into sewage; must be routed to certified biofuel processors.",
+    "tier_rule": "FoodLoop routes used fryer and cooking oil exclusively to certified Tier E (Industrial Recycling / Biodiesel)."
+  },
+  {
+    "id": "CPCB-PWM-2021-PKG",
+    "authority": "Ministry of Environment, Forest and Climate Change (MoEFCC)",
+    "regulation": "Plastic Waste Management Rules, 2016 (Amended 2021)",
+    "clause": "Rule 9 - Prescribed Standards for De-packaging and Segregation",
+    "title": "Mandatory De-packaging of Spoiled and Packaged Food Waste",
+    "keywords": ["packaging", "plastics", "de-packaging", "wrappers", "bottles", "compost contamination", "single-use"],
+    "text": "Commercial food waste packaged in multi-layered plastics, sachets, polybags, or aluminum foils must be systematically de-packaged prior to loading into composting heaps or anaerobic digestion digesters. Non-biodegradable plastics introduce microplastic contamination into agricultural compost, rendering the organic fertilizer non-compliant with FCO (Fertilizer Control Order) standards.",
+    "legal_mandate": "Zero plastic packaging contamination in organic compost or anaerobic biogas digesters.",
+    "tier_rule": "FoodLoop flags packaged lots for mandatory manual or mechanical de-packaging, routing clean packaging to Tier E (Recycling)."
+  },
+  {
+    "id": "FSSAI-COLD-2020-TRANSIT",
+    "authority": "FSSAI",
+    "regulation": "Food Safety and Standards (Licensing and Registration of Food Businesses) Schedule IV",
+    "clause": "Schedule IV - Specific Sanitary Practices for Cold Chain Logistics",
+    "title": "Cold Chain Integrity and Temperature Breach Protocol",
+    "keywords": ["cold chain", "chilled transit", "dairy transit", "meat temperature", "reefer", "temperature breach"],
+    "text": "Chilled food items (dairy, butchery meats, vaccine-sensitive biologicals) must be transported in temperature-controlled reefer vehicles maintaining core temperatures below 5°C continuously. If a temperature breach exceeding 8°C persists for more than 2 hours during transit, the consignment is considered temperature-abused and compromised. Such stock is forbidden from human retail or charitable donation.",
+    "legal_mandate": "Temperature-abused chilled items cannot enter human consumption after a transit cold chain failure.",
+    "tier_rule": "Lots suffering cold chain failure are locked out of Tiers B and C, diverted directly to Tier D (Biogas / Composting)."
+  },
+  {
+    "id": "CPCB-BIO-2016-BWG",
+    "authority": "CPCB & State Pollution Control Boards (SPCB)",
+    "regulation": "Solid Waste Management Rules, 2016",
+    "clause": "Rule 3(1)(7) & Rule 4(7) - Bulk Waste Generator On-Site Mandate",
+    "title": "Bulk Waste Generator On-Site Composting and Landfill Ban",
+    "keywords": ["bulk waste generator", "bwg", "100kg", "on-site composting", "landfill ban", "municipal fine"],
+    "text": "Any establishment, commercial complex, hotel, banquet hall, or catering business generating an average of more than 100 kg of waste per day across all streams is classified as a Bulk Waste Generator (BWG). BWGs are legally prohibited from handing unsegregated organic waste to municipal collection vehicles for landfilling. BWGs must process wet waste on-site via biomethanation/composting or engage an authorized off-site recovery network.",
+    "legal_mandate": "Establishments producing >100 kg/day of waste cannot dump organic waste in landfills.",
+    "tier_rule": "FoodLoop provides verified digital consignment dispatch proof so BWGs can demonstrate 100% landfill diversion compliance to municipal inspectors."
   }
 ]
