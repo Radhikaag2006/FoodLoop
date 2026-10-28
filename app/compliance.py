@@ -16,6 +16,7 @@ import json
 import math
 import os
 import re
+import unicodedata
 from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -345,7 +346,208 @@ def _load_documents() -> List[Dict[str, Any]]:
 
 
 DOCUMENTS = _load_documents()
-INDEX = SemanticVectorIndex(DOCUMENTS)
+
+# ---- plain-language summaries and extra search words (separate data files) ----
+SUMMARY_PATH = Path(__file__).parent / "data" / "answer_summaries.json"
+TERMS_PATH = Path(__file__).parent / "data" / "hindi_terms.json"
+
+
+def _load_json(path: Path) -> Dict[str, Any]:
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+SUMMARIES: Dict[str, Dict[str, Any]] = {
+    k: v for k, v in _load_json(SUMMARY_PATH).items() if not k.startswith("_")}
+
+
+def _with_search_words(doc: Dict[str, Any]) -> Dict[str, Any]:
+    """The same regulation, plus the extra words people use to ask about it."""
+    extra = SUMMARIES.get(doc.get("id", ""), {}).get("extra_keywords", [])
+    return dict(doc, keywords=list(doc.get("keywords", [])) + list(extra))
+
+
+INDEX = SemanticVectorIndex([_with_search_words(d) for d in DOCUMENTS])
+
+
+# ---- Hindi / Hinglish / Devanagari understanding ----
+def _norm_dev(text: str) -> str:
+    """Lower-case, and fold spellings that vary in Devanagari (nukta, chandrabindu)."""
+    t = unicodedata.normalize("NFC", text.lower())
+    t = t.replace("\u093c", "")                 # nukta: ज़ -> ज, ड़ -> ड
+    return t.replace("\u0901", "\u0902")        # chandrabindu -> anusvara
+
+
+_TOKEN_RE = re.compile(r"[a-z0-9]+|[\u0900-\u097f]+")
+
+
+def _words(text: str) -> List[str]:
+    return _TOKEN_RE.findall(_norm_dev(text))
+
+
+def _load_terms() -> Dict[str, Any]:
+    raw = _load_json(TERMS_PATH)
+    norm = lambda d: {_norm_dev(k): v for k, v in d.items()}
+    phrases = {tuple(_words(k)): v for k, v in raw.get("phrases", {}).items()}
+    return {
+        "terms": norm(raw.get("terms", {})),
+        "prefixes": norm(raw.get("prefixes", {})),
+        "phrases": phrases,
+        "markers": {_norm_dev(m) for m in raw.get("hinglish_markers", [])},
+        "greetings": {_norm_dev(g) for g in raw.get("greetings", [])},
+    }
+
+
+TERMS = _load_terms()
+_DEVANAGARI = re.compile(r"[\u0900-\u097f]")
+
+
+def expand_query(query: str) -> Tuple[str, bool]:
+    """Add the English terms behind Hindi/Hinglish words to a question.
+
+    Returns (question + added English terms, whether it is a Hindi question)."""
+    words = _words(query)
+    adds: List[str] = []
+    for i in range(len(words)):                       # whole phrases first
+        for phrase, en in TERMS["phrases"].items():
+            n = len(phrase)
+            if n and tuple(words[i:i + n]) == phrase:
+                adds += en
+    for w in words:
+        adds += TERMS["terms"].get(w, [])
+        for pre, en in TERMS["prefixes"].items():
+            if w.startswith(pre):
+                adds += en
+    hindi = bool(_DEVANAGARI.search(query)) or any(w in TERMS["markers"] for w in words)
+    return (query + " " + " ".join(dict.fromkeys(adds))).strip(), hindi
+
+
+# Words that on their own do not make a question about food waste.
+WEAK_TERMS = {
+    "food", "eat", "date", "hot", "cold", "used", "wet", "hour", "hours", "law", "section",
+    "kg", "100", "59", "chain", "log", "record", "records", "window", "kitchen", "complex",
+    "cooking", "time", "old", "dry", "iv", "ban", "wheat", "meat", "oil", "cooked",
+    "bad", "burnt", "frying", "fryer", "fried", "delivery",
+}
+# Everyday words that are clearly about this subject.
+EXTRA_DOMAIN_TERMS = {
+    "milk", "curd", "yogurt", "ghee", "butter", "cheese", "vegetable", "vegetables", "fruit", "fruits",
+    "leftover", "leftovers", "dal", "rice", "sweets", "donate", "donation", "expired", "expiry", "expire",
+    "stale", "spoiled", "spoil", "rotten", "mold", "mould", "fungus", "penalty", "licence", "license",
+    "fssai", "restaurant", "catering", "banquet", "plastic", "landfill", "compost", "biogas", "dustbin",
+    "garbage", "trash", "gaushala", "unfit", "biodiesel", "swill", "surplus", "bakery", "bread", "roti",
+    "chapati", "cow", "cattle", "livestock", "temple", "prasad", "langar", "sachet", "polythene",
+    "bad", "burnt", "frying", "fryer", "fried", "delivery",
+}
+# Shopping, recipes and similar: not a question about the rules unless a real concern is also raised.
+OFF_INTENT = {
+    "price", "prices", "cost", "buy", "buying", "brand", "brands", "best", "cheap", "recipe", "recipes",
+    "ingredients", "calories", "calorie", "nutrition", "diet", "vitamin", "protein", "benefits",
+    "weather", "movie", "song", "cricket", "score",
+}
+
+
+# What the assistant is for: a question is on topic when it raises one of these concerns
+# (condition, donation, animal feed, disposal, penalties, storage, transport, records ...).
+# A food name on its own ("dal", "milk") is not a question about the rules.
+CONCERN_TERMS = {
+    "expired", "expiry", "expire", "stale", "spoiled", "spoil", "spoilage", "rotten", "rot", "mold", "mould",
+    "fungus", "fungal", "unfit", "smell", "insect", "infestation", "unsafe", "contamination", "contaminated",
+    "donate", "donation", "distribute", "sell", "surplus", "leftover", "leftovers", "swill", "ngo", "charity",
+    "waste", "garbage", "trash", "dispose", "disposal", "dump", "landfill", "drain", "dustbin", "compost",
+    "biogas", "biodiesel", "segregate", "segregation", "decay",
+    "feed", "cattle", "cow", "bovine", "livestock", "animal", "gaushala", "goshala", "buffalo", "goat",
+    "sheep", "pig", "poultry",
+    "penalty", "penalties", "fine", "punishment", "imprisonment", "prosecution", "liability", "offence",
+    "licence", "license", "registration", "fbo", "fssai", "regulation", "regulations", "cpcb", "spcb",
+    "packaging", "plastic", "sachet", "polythene", "wrapper",
+    "temperature", "holding", "storage", "refrigeration", "chilled", "reefer", "transit", "tamper",
+    "traceability", "audit", "bulk", "bwg", "municipal", "tpc", "ruco", "uco",
+    "melted", "thawed", "frozen", "froze", "spoilt", "sold", "selling",
+}
+
+
+# Concerns strong enough to keep a question on topic even if it also mentions a price or a recipe.
+CORE_CONCERNS = {
+    "expired", "expiry", "expire", "stale", "spoiled", "spoil", "spoilage", "rotten", "mold", "mould", "fungus",
+    "donate", "donation", "surplus", "leftover", "leftovers", "swill", "waste", "garbage", "dispose", "disposal",
+    "compost", "biogas", "landfill", "feed", "cattle", "livestock", "gaushala", "penalty", "penalties",
+    "punishment", "licence", "license", "fssai", "unsafe", "contaminated",
+}
+
+
+def _domain_terms() -> set:
+    vocab = set(EXTRA_DOMAIN_TERMS)
+    for words in SEMANTIC_CONCEPTS.values():
+        vocab.update(words)
+    for d in INDEX.docs:
+        for kw in d.get("keywords", []):
+            vocab.update(_tokenize(kw))
+    return {w for w in vocab if w not in STOPWORDS}
+
+
+DOMAIN_TERMS = _domain_terms()
+
+
+def _stems(t: str):
+    yield t
+    if t.endswith("es"):
+        yield t[:-2]
+    if t.endswith("s"):
+        yield t[:-1]
+    if t.endswith("ing"):
+        yield t[:-3]
+        yield t[:-3] + "e"
+    if t.endswith("ed"):
+        yield t[:-2]
+        yield t[:-1]
+
+
+def is_in_scope(expanded_query: str) -> bool:
+    """True when the question is about food safety, surplus, feed, expiry or waste.
+
+    One concern word (expired, donate, cattle, penalty, dispose ...) is enough. Generic
+    words (date, hot, section ...) only count when there are at least two of them, and a
+    food name on its own does not make a question about the rules."""
+    concern, weak = False, set()
+    tokens = _tokenize(expanded_query)
+    shopping = any(t in OFF_INTENT for t in tokens)
+    for t in tokens:
+        for st in _stems(t):
+            if st in CONCERN_TERMS:
+                concern = True
+                break
+            if st in DOMAIN_TERMS and (st in WEAK_TERMS or t in WEAK_TERMS):
+                weak.add(t)
+                break
+    if shopping and not any(
+            st in CORE_CONCERNS for t in tokens for st in _stems(t)):
+        return False
+    return concern or len(weak) >= 2
+
+
+def _is_greeting(query: str) -> bool:
+    words = _words(query)
+    return bool(words) and all(w in TERMS["greetings"] for w in words)
+
+
+OUT_OF_SCOPE = {
+    "en": ("That's outside what I can help with. I answer questions about food safety, surplus food "
+           "donation, animal feed, expired or spoiled food, waste disposal and FSSAI rules in India.\n\n"
+           "For example: \"Can expired bread go to cattle feed?\" or \"What is the penalty under FSSAI Section 59?\""),
+    "hi": ("यह सवाल मेरे दायरे से बाहर है। मैं खाद्य सुरक्षा, बचा हुआ खाना दान करने, पशु चारा, एक्सपायर्ड या ख़राब खाना, "
+           "कचरा निपटान और भारत में FSSAI के नियमों से जुड़े सवालों के जवाब देता हूँ।\n\n"
+           "जैसे: \"बासी रोटी गाय को खिला सकते हैं?\" या \"FSSAI धारा 59 में जुर्माना कितना है?\""),
+}
+GREETING = {
+    "en": ("Hello! I can help with food safety, surplus food, animal feed, expired or spoiled food, waste "
+           "disposal and FSSAI rules. What would you like to know?"),
+    "hi": ("नमस्ते! मैं खाद्य सुरक्षा, बचा हुआ खाना, पशु चारा, एक्सपायर्ड या ख़राब खाना, कचरा निपटान और FSSAI के "
+           "नियमों में आपकी मदद कर सकता हूँ। आप क्या जानना चाहते हैं?"),
+}
 
 
 def get_all_regulations() -> List[Dict[str, Any]]:
@@ -441,7 +643,8 @@ def check_lot_compliance(
     }
 
 
-def _ask_gemini(query: str, retrieved_chunks: List[Dict[str, Any]], api_key: str) -> Optional[str]:
+def _ask_gemini(query: str, retrieved_chunks: List[Dict[str, Any]], api_key: str,
+                hindi: bool = False) -> Optional[str]:
     """Calls Gemini API to synthesize answer from retrieved legal context with deep Indic culinary fluency."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
     headers = {"Content-Type": "application/json"}
@@ -466,6 +669,9 @@ def _ask_gemini(query: str, retrieved_chunks: List[Dict[str, Any]], api_key: str
         f"--- OFFICIAL REGULATORY CONTEXT ---\n{context_str}\n-----------------------------------\n\n"
         f"USER INQUIRY: {query}\n\n"
         "Instructions:\n"
+        "0. Answer ONLY the question asked, in plain words, in at most 150 words, with no markdown headings. "
+        "If the context does not answer it, say so briefly instead of guessing. "
+        + ("Reply in simple Hindi written in Devanagari script. " if hindi else "Reply in English. ") + "\n"
         "1. Give a direct, plain-language ruling in your opening sentence. If asked about feeding rotis to cows/gaushalas, say clearly whether it is permitted (Yes, if clean and mold-free), and under what specific safety conditions.\n"
         "2. Explain the safety requirements (e.g. rotis must be dry, not moldy/aflatoxin-contaminated, and not soaked with spicy/oily dal/curry or non-veg swill).\n"
         "3. Cite the exact Regulation, Section, or Clause numbers from the context.\n"
@@ -488,87 +694,70 @@ def _ask_gemini(query: str, retrieved_chunks: List[Dict[str, Any]], api_key: str
     return None
 
 
-def _offline_synthesize(query: str, chunks: List[Dict[str, Any]]) -> str:
-    """Actionable, grounded answer generation tailored to Indian food business realities."""
+def _is_roti_cow_question(q_lower: str) -> bool:
+    return (any(k in q_lower for k in ("roti", "rotis", "chapati", "chapatis", "phulka", "bread", "atta"))
+            and any(k in q_lower for k in ("cow", "cows", "gaushala", "goshala", "cattle", "feed")))
+
+
+def _offline_synthesize(query: str, chunks: List[Dict[str, Any]], hindi: bool = False) -> str:
+    """A grounded answer: the short answer first, then why, then what FoodLoop does."""
     if not chunks:
-        return (
-            "No specific FSSAI regulation matched your query. All food business operators "
-            "must follow FSSAI 2019 guidelines ensuring food past expiry or showing decay is never routed "
-            "to human or animal feed chains."
-        )
+        return OUT_OF_SCOPE["hi" if hindi else "en"]
 
-    q_lower = query.lower()
     primary = chunks[0]
+    info = SUMMARIES.get(primary["id"], {})
 
-    # Contextual tailoring for common Indian business inquiries
-    if any(k in q_lower for k in ("roti", "rotis", "chapati", "chapatis", "phulka", "bread", "atta")) and any(k in q_lower for k in ("cow", "cows", "gaushala", "goshala", "cattle", "feed")):
+    if hindi:
+        short = info.get("short_hi")
+        if short:
+            lines = [f"संक्षिप्त उत्तर: {short}", ""]
+            if info.get("action_hi"):
+                lines.append(f"FoodLoop में क्या होता है: {info['action_hi']}")
+            lines.append(f"नियम: {primary['clause']} ({primary['authority']})")
+            return "\n".join(lines)
+        # no Hindi text for this rule: fall through to the English answer
+
+    # keep the detailed roti / gaushala ruling as it was
+    if not hindi and _is_roti_cow_question(query.lower()):
         return (
-            "### Legal Ruling: Roti & Grain Donation to Gaushalas (Permitted with Conditions)\n\n"
-            "**Yes, clean vegetarian rotis, chapatis, and bakery grains CAN be donated to registered Gaushalas (cattle shelters) and dairy farms under FoodLoop Tier C (Animal Feed).**\n\n"
-            "**Statutory Grounding:** *FSSAI & DAHD Livestock Feed Advisory (Clause 4.2)*\n\n"
-            "**Key Compliance Requirements:**\n"
-            "• **Must Be Mold-Free:** Rotis must be dry and free from fungal mold (Rhizopus or Aspergillus). Moldy grains produce toxic aflatoxins that are lethal to cattle and illegal to distribute.\n"
-            "• **No Oily Curries / Catering Gravy:** Rotis must NOT be soaked in spicy dal, sabzi, or non-vegetarian gravies. Such oily catering swill triggers fatal rumen acidosis in cattle.\n"
-            "• **Proper Segregation:** Collect dry rotis in clean, ventilated containers within 12–24 hours of baking.\n\n"
-            "**FoodLoop Routing Action:**\n"
-            "• Clean, dry rotis/chapatis ➔ **Tier C (Gaushala / Cattle Feed)**\n"
-            "• Moldy, wet, or curry-soaked rotis ➔ **Tier D (Biogas / Composting)**"
+            "Legal Ruling: Roti & Grain Donation to Gaushalas (Permitted with Conditions)\n\n"
+            "Yes, clean vegetarian rotis, chapatis, and bakery grains CAN be donated to registered Gaushalas "
+            "(cattle shelters) and dairy farms under FoodLoop Tier C (Animal Feed).\n\n"
+            "Statutory Grounding: FSSAI & DAHD Livestock Feed Advisory (Clause 4.2)\n\n"
+            "Key Compliance Requirements:\n"
+            "• Must Be Mold-Free: Rotis must be dry and free from fungal mold (Rhizopus or Aspergillus). "
+            "Moldy grains produce toxic aflatoxins that are lethal to cattle and illegal to distribute.\n"
+            "• No Oily Curries / Catering Gravy: Rotis must NOT be soaked in spicy dal, sabzi, or non-vegetarian "
+            "gravies. Such oily catering swill triggers fatal rumen acidosis in cattle.\n"
+            "• Proper Segregation: Collect dry rotis in clean, ventilated containers within 12–24 hours of baking.\n\n"
+            "FoodLoop Routing Action:\n"
+            "• Clean, dry rotis/chapatis ➔ Tier C (Gaushala / Cattle Feed)\n"
+            "• Moldy, wet, or curry-soaked rotis ➔ Tier D (Biogas / Composting)"
         )
 
-    out = [
-        f"Legal Assessment: {primary['title']}",
-        f"Governing Authority: {primary['authority']}, {primary['clause']}",
-        "",
-        f"Statutory Rule: {primary['text']}",
-        "",
-        f"Legal Mandate: {primary['legal_mandate']}",
-        f"FoodLoop Action: {primary['tier_rule']}",
+    # The direct answer first, then the rule's own wording so the answer can be checked against it.
+    short = info.get("short") or primary["text"]
+    out = [f"Short answer: {short}", ""]
+    if info.get("short"):
+        out += [f"The rule says: {primary['text']}", ""]
+    out += [
+        f"Why: {primary['legal_mandate']}",
+        f"What FoodLoop does: {primary['tier_rule']}",
+        f"Source: {primary['clause']} ({primary['authority']})",
     ]
-
     if len(chunks) > 1:
-        out.append("\nAdditional Applicable Regulations:")
+        out.append("\nAlso relevant:")
         for c in chunks[1:]:
             out.append(f"• {c['clause']} ({c['authority']}): {c['legal_mandate']}")
-
     return "\n".join(out)
 
 
-
-def ask_compliance_copilot(query: str) -> Dict[str, Any]:
-    """Semantic RAG pipeline: Retrieve relevant legal clauses via vector similarity & synthesize guidance."""
-    cleaned_query = query.strip()
-    if not cleaned_query:
-        return {
-            "query": query,
-            "answer": "Please ask a question regarding food safety, FSSAI regulations, cattle feed restrictions, or disposal rules.",
-            "citations": [],
-            "source": "empty",
-            "retrieval_mode": "none",
-        }
-
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-
-    # True semantic search with hybrid fallback
-    retrieved = INDEX.search(cleaned_query, top_k=3, api_key=api_key or None)
-    chunks = [r[0] for r in retrieved]
-    retrieval_mode = retrieved[0][2] if retrieved else "latent_semantic_vector"
-
-    answer = None
-    source = "offline_rag_engine"
-
-    if api_key:
-        answer = _ask_gemini(cleaned_query, chunks, api_key)
-        if answer:
-            source = "gemini_rag_grounded"
-
-    if not answer:
-        answer = _offline_synthesize(cleaned_query, chunks)
-
+def _result(query: str, answer: str, source: str, mode: str, chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
     return {
-        "query": cleaned_query,
+        "query": query,
         "answer": answer,
         "source": source,
-        "retrieval_mode": retrieval_mode,
+        "retrieval_mode": mode,
         "citations": [
             {
                 "id": c["id"],
@@ -581,3 +770,46 @@ def ask_compliance_copilot(query: str) -> Dict[str, Any]:
             for c in chunks
         ],
     }
+
+
+def ask_compliance_copilot(query: str) -> Dict[str, Any]:
+    """Semantic RAG pipeline: understand the question (English, Hinglish or Hindi), stay in scope,
+    retrieve the relevant legal clauses and answer directly."""
+    cleaned_query = query.strip()
+    if not cleaned_query:
+        return {
+            "query": query,
+            "answer": "Please ask a question regarding food safety, FSSAI regulations, cattle feed restrictions, or disposal rules.",
+            "citations": [],
+            "source": "empty",
+            "retrieval_mode": "none",
+        }
+
+    expanded, hindi = expand_query(cleaned_query)
+    lang = "hi" if hindi else "en"
+
+    if _is_greeting(cleaned_query):
+        return _result(cleaned_query, GREETING[lang], "greeting", "none", [])
+    if not is_in_scope(expanded):
+        return _result(cleaned_query, OUT_OF_SCOPE[lang], "out_of_scope", "none", [])
+
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+
+    # True semantic search with hybrid fallback (on the question plus the English terms behind it)
+    retrieved = INDEX.search(expanded, top_k=3, api_key=api_key or None)
+    best = retrieved[0][1] if retrieved else 0.0
+    chunks = [r[0] for i, r in enumerate(retrieved) if i == 0 or r[1] >= 0.5 * best]
+    retrieval_mode = retrieved[0][2] if retrieved else "latent_semantic_vector"
+
+    answer = None
+    source = "offline_rag_engine"
+
+    if api_key:
+        answer = _ask_gemini(cleaned_query, chunks, api_key, hindi)
+        if answer:
+            source = "gemini_rag_grounded"
+
+    if not answer:
+        answer = _offline_synthesize(expanded, chunks, hindi)
+
+    return _result(cleaned_query, answer, source, retrieval_mode, chunks)

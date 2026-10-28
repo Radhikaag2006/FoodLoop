@@ -1,0 +1,1823 @@
+{
+  "_about": "Everyday Hindi / Hinglish / Devanagari words mapped to the English terms the regulations use. A word here lets the assistant understand a question; it never adds a legal claim. Keys are matched as whole words (or as a start of a word when listed under prefixes). Edit freely: add a word and the English terms it should stand for.",
+  "terms": {
+    "roti": [
+      "roti",
+      "chapati"
+    ],
+    "rotiyan": [
+      "roti",
+      "chapati"
+    ],
+    "rotiyaan": [
+      "roti",
+      "chapati"
+    ],
+    "chapati": [
+      "roti",
+      "chapati"
+    ],
+    "chapatti": [
+      "roti",
+      "chapati"
+    ],
+    "chapatiyan": [
+      "roti",
+      "chapati"
+    ],
+    "phulka": [
+      "roti",
+      "chapati"
+    ],
+    "paratha": [
+      "roti",
+      "chapati"
+    ],
+    "parantha": [
+      "roti",
+      "chapati"
+    ],
+    "naan": [
+      "roti",
+      "chapati"
+    ],
+    "puri": [
+      "roti",
+      "chapati"
+    ],
+    "रोटी": [
+      "roti",
+      "chapati"
+    ],
+    "रोटियां": [
+      "roti",
+      "chapati"
+    ],
+    "चपाती": [
+      "roti",
+      "chapati"
+    ],
+    "चपातियां": [
+      "roti",
+      "chapati"
+    ],
+    "फुलका": [
+      "roti",
+      "chapati"
+    ],
+    "पराठा": [
+      "roti",
+      "chapati"
+    ],
+    "नान": [
+      "roti",
+      "chapati"
+    ],
+    "पूरी": [
+      "roti",
+      "chapati"
+    ],
+    "dahi": [
+      "dairy",
+      "curd",
+      "milk"
+    ],
+    "doodh": [
+      "dairy",
+      "milk"
+    ],
+    "dudh": [
+      "dairy",
+      "milk"
+    ],
+    "paneer": [
+      "dairy",
+      "milk"
+    ],
+    "khoya": [
+      "dairy",
+      "milk"
+    ],
+    "mawa": [
+      "dairy",
+      "milk"
+    ],
+    "ghee": [
+      "dairy",
+      "milk"
+    ],
+    "makhan": [
+      "dairy",
+      "milk"
+    ],
+    "malai": [
+      "dairy",
+      "milk"
+    ],
+    "raita": [
+      "dairy",
+      "curd"
+    ],
+    "lassi": [
+      "dairy",
+      "milk"
+    ],
+    "chaas": [
+      "dairy",
+      "milk"
+    ],
+    "chhach": [
+      "dairy",
+      "milk"
+    ],
+    "दही": [
+      "dairy",
+      "curd",
+      "milk"
+    ],
+    "दूध": [
+      "dairy",
+      "milk"
+    ],
+    "पनीर": [
+      "dairy",
+      "milk"
+    ],
+    "खोया": [
+      "dairy",
+      "milk"
+    ],
+    "मावा": [
+      "dairy",
+      "milk"
+    ],
+    "घी": [
+      "dairy",
+      "milk"
+    ],
+    "मक्खन": [
+      "dairy",
+      "milk"
+    ],
+    "मलाई": [
+      "dairy",
+      "milk"
+    ],
+    "रायता": [
+      "dairy",
+      "curd"
+    ],
+    "लस्सी": [
+      "dairy",
+      "milk"
+    ],
+    "छाछ": [
+      "dairy",
+      "milk"
+    ],
+    "dal": [
+      "cooked",
+      "curry",
+      "dal"
+    ],
+    "daal": [
+      "cooked",
+      "curry",
+      "dal"
+    ],
+    "sabzi": [
+      "cooked",
+      "curry",
+      "vegetable"
+    ],
+    "sabji": [
+      "cooked",
+      "curry",
+      "vegetable"
+    ],
+    "subzi": [
+      "cooked",
+      "curry",
+      "vegetable"
+    ],
+    "curry": [
+      "cooked",
+      "curry"
+    ],
+    "gravy": [
+      "cooked",
+      "curry",
+      "gravy"
+    ],
+    "rajma": [
+      "cooked",
+      "curry"
+    ],
+    "chole": [
+      "cooked",
+      "curry"
+    ],
+    "kadhi": [
+      "cooked",
+      "curry"
+    ],
+    "chawal": [
+      "cooked",
+      "rice",
+      "grain"
+    ],
+    "bhat": [
+      "cooked",
+      "rice",
+      "grain"
+    ],
+    "biryani": [
+      "cooked",
+      "rice"
+    ],
+    "pulao": [
+      "cooked",
+      "rice"
+    ],
+    "khichdi": [
+      "cooked",
+      "rice"
+    ],
+    "दाल": [
+      "cooked",
+      "curry",
+      "dal"
+    ],
+    "सब्जी": [
+      "cooked",
+      "curry",
+      "vegetable"
+    ],
+    "करी": [
+      "cooked",
+      "curry"
+    ],
+    "ग्रेवी": [
+      "cooked",
+      "curry",
+      "gravy"
+    ],
+    "राजमा": [
+      "cooked",
+      "curry"
+    ],
+    "छोले": [
+      "cooked",
+      "curry"
+    ],
+    "कढी": [
+      "cooked",
+      "curry"
+    ],
+    "चावल": [
+      "cooked",
+      "rice",
+      "grain"
+    ],
+    "भात": [
+      "cooked",
+      "rice",
+      "grain"
+    ],
+    "बिरयानी": [
+      "cooked",
+      "rice"
+    ],
+    "पुलाव": [
+      "cooked",
+      "rice"
+    ],
+    "खिचडी": [
+      "cooked",
+      "rice"
+    ],
+    "atta": [
+      "grain",
+      "wheat"
+    ],
+    "maida": [
+      "grain",
+      "wheat"
+    ],
+    "besan": [
+      "grain"
+    ],
+    "suji": [
+      "grain"
+    ],
+    "आटा": [
+      "grain",
+      "wheat"
+    ],
+    "मैदा": [
+      "grain",
+      "wheat"
+    ],
+    "बेसन": [
+      "grain"
+    ],
+    "सूजी": [
+      "grain"
+    ],
+    "phal": [
+      "fruit"
+    ],
+    "phalon": [
+      "fruit"
+    ],
+    "फल": [
+      "fruit"
+    ],
+    "फलों": [
+      "fruit"
+    ],
+    "pav": [
+      "bakery",
+      "bread"
+    ],
+    "ब्रेड": [
+      "bakery",
+      "bread"
+    ],
+    "पाव": [
+      "bakery",
+      "bread"
+    ],
+    "बन": [
+      "bakery",
+      "bread"
+    ],
+    "बिस्किट": [
+      "bakery",
+      "snacks"
+    ],
+    "केक": [
+      "bakery",
+      "bread"
+    ],
+    "mithai": [
+      "sweets",
+      "cooked",
+      "surplus"
+    ],
+    "laddu": [
+      "sweets",
+      "cooked"
+    ],
+    "barfi": [
+      "sweets",
+      "cooked"
+    ],
+    "halwa": [
+      "sweets",
+      "cooked"
+    ],
+    "jalebi": [
+      "sweets",
+      "cooked"
+    ],
+    "मिठाई": [
+      "sweets",
+      "cooked",
+      "surplus"
+    ],
+    "लड्डू": [
+      "sweets",
+      "cooked"
+    ],
+    "बर्फी": [
+      "sweets",
+      "cooked"
+    ],
+    "हलवा": [
+      "sweets",
+      "cooked"
+    ],
+    "जलेबी": [
+      "sweets",
+      "cooked"
+    ],
+    "prasad": [
+      "prasad",
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "prasadam": [
+      "prasad",
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "bhog": [
+      "prasad",
+      "temple",
+      "surplus"
+    ],
+    "langar": [
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "mandir": [
+      "temple",
+      "prasad",
+      "surplus"
+    ],
+    "gurudwara": [
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "gurdwara": [
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "bhandara": [
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "प्रसाद": [
+      "prasad",
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "भोग": [
+      "prasad",
+      "temple",
+      "surplus"
+    ],
+    "लंगर": [
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "मंदिर": [
+      "temple",
+      "prasad",
+      "surplus"
+    ],
+    "गुरुद्वारा": [
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "भंडारा": [
+      "langar",
+      "temple",
+      "surplus"
+    ],
+    "dhaba": [
+      "catering",
+      "restaurant"
+    ],
+    "halwai": [
+      "catering",
+      "restaurant"
+    ],
+    "canteen": [
+      "catering",
+      "restaurant"
+    ],
+    "shaadi": [
+      "catering",
+      "banquet",
+      "surplus"
+    ],
+    "shadi": [
+      "catering",
+      "banquet",
+      "surplus"
+    ],
+    "ढाबा": [
+      "catering",
+      "restaurant"
+    ],
+    "हलवाई": [
+      "catering",
+      "restaurant"
+    ],
+    "होटल": [
+      "catering",
+      "restaurant",
+      "hotel"
+    ],
+    "रेस्टोरेंट": [
+      "catering",
+      "restaurant"
+    ],
+    "कैंटीन": [
+      "catering",
+      "restaurant"
+    ],
+    "मेस": [
+      "catering",
+      "restaurant"
+    ],
+    "शादी": [
+      "catering",
+      "banquet",
+      "surplus"
+    ],
+    "कैटरिंग": [
+      "catering",
+      "restaurant"
+    ],
+    "baasi": [
+      "stale",
+      "spoiled",
+      "expired"
+    ],
+    "basi": [
+      "stale",
+      "spoiled",
+      "expired"
+    ],
+    "बासी": [
+      "stale",
+      "spoiled",
+      "expired"
+    ],
+    "kharab": [
+      "spoiled",
+      "unfit"
+    ],
+    "kharaab": [
+      "spoiled",
+      "unfit"
+    ],
+    "kharabi": [
+      "spoiled",
+      "unfit"
+    ],
+    "खराब": [
+      "spoiled",
+      "unfit"
+    ],
+    "sada": [
+      "spoiled",
+      "rotten"
+    ],
+    "sadi": [
+      "spoiled",
+      "rotten"
+    ],
+    "sade": [
+      "spoiled",
+      "rotten"
+    ],
+    "sadna": [
+      "spoiled",
+      "rotten"
+    ],
+    "sadne": [
+      "spoiled",
+      "rotten"
+    ],
+    "सडा": [
+      "spoiled",
+      "rotten"
+    ],
+    "सडी": [
+      "spoiled",
+      "rotten"
+    ],
+    "सडे": [
+      "spoiled",
+      "rotten"
+    ],
+    "सडना": [
+      "spoiled",
+      "rotten"
+    ],
+    "सड़": [
+      "spoiled",
+      "rotten"
+    ],
+    "fungus": [
+      "mold",
+      "fungus",
+      "spoiled"
+    ],
+    "fafund": [
+      "mold",
+      "fungus",
+      "spoiled"
+    ],
+    "phafund": [
+      "mold",
+      "fungus",
+      "spoiled"
+    ],
+    "phaphund": [
+      "mold",
+      "fungus",
+      "spoiled"
+    ],
+    "fafoond": [
+      "mold",
+      "fungus",
+      "spoiled"
+    ],
+    "फफूंद": [
+      "mold",
+      "fungus",
+      "spoiled"
+    ],
+    "फंगस": [
+      "mold",
+      "fungus",
+      "spoiled"
+    ],
+    "badbu": [
+      "smell",
+      "spoiled"
+    ],
+    "badboo": [
+      "smell",
+      "spoiled"
+    ],
+    "बदबू": [
+      "smell",
+      "spoiled"
+    ],
+    "दुर्गंध": [
+      "smell",
+      "spoiled"
+    ],
+    "keede": [
+      "insect",
+      "infestation",
+      "spoiled"
+    ],
+    "keeda": [
+      "insect",
+      "infestation",
+      "spoiled"
+    ],
+    "kide": [
+      "insect",
+      "infestation",
+      "spoiled"
+    ],
+    "कीडे": [
+      "insect",
+      "infestation",
+      "spoiled"
+    ],
+    "कीडा": [
+      "insect",
+      "infestation",
+      "spoiled"
+    ],
+    "expire": [
+      "expired",
+      "expiry"
+    ],
+    "expiry": [
+      "expired",
+      "expiry"
+    ],
+    "ekspaayar": [
+      "expired",
+      "expiry"
+    ],
+    "एक्सपायर": [
+      "expired",
+      "expiry"
+    ],
+    "एक्सपायर्ड": [
+      "expired",
+      "expiry"
+    ],
+    "एक्सपायरी": [
+      "expired",
+      "expiry"
+    ],
+    "मियाद": [
+      "expired",
+      "expiry"
+    ],
+    "miyaad": [
+      "expired",
+      "expiry"
+    ],
+    "ghante": [
+      "hours",
+      "hour",
+      "holding"
+    ],
+    "ghanta": [
+      "hours",
+      "hour",
+      "holding"
+    ],
+    "घंटे": [
+      "hours",
+      "hour",
+      "holding"
+    ],
+    "घंटा": [
+      "hours",
+      "hour",
+      "holding"
+    ],
+    "pakka": [
+      "cooked"
+    ],
+    "pakaa": [
+      "cooked"
+    ],
+    "pakaya": [
+      "cooked"
+    ],
+    "pakayi": [
+      "cooked"
+    ],
+    "पका": [
+      "cooked"
+    ],
+    "पकी": [
+      "cooked"
+    ],
+    "पकाया": [
+      "cooked"
+    ],
+    "garam": [
+      "hot"
+    ],
+    "गर्म": [
+      "hot"
+    ],
+    "thanda": [
+      "cold",
+      "chilled"
+    ],
+    "thandi": [
+      "cold",
+      "chilled"
+    ],
+    "ठंडा": [
+      "cold",
+      "chilled"
+    ],
+    "ठंडी": [
+      "cold",
+      "chilled"
+    ],
+    "fridge": [
+      "refrigeration",
+      "cold",
+      "chilled"
+    ],
+    "firij": [
+      "refrigeration",
+      "cold",
+      "chilled"
+    ],
+    "freezer": [
+      "refrigeration",
+      "cold",
+      "chilled"
+    ],
+    "फ्रिज": [
+      "refrigeration",
+      "cold",
+      "chilled"
+    ],
+    "फ्रीजर": [
+      "refrigeration",
+      "cold",
+      "chilled"
+    ],
+    "gaadi": [
+      "transit",
+      "truck",
+      "transport",
+      "cold",
+      "chain"
+    ],
+    "gadi": [
+      "transit",
+      "truck",
+      "transport",
+      "cold",
+      "chain"
+    ],
+    "truck": [
+      "transit",
+      "truck",
+      "transport"
+    ],
+    "गाडी": [
+      "transit",
+      "truck",
+      "transport",
+      "cold",
+      "chain"
+    ],
+    "ट्रक": [
+      "transit",
+      "truck",
+      "transport"
+    ],
+    "tapman": [
+      "temperature"
+    ],
+    "taapman": [
+      "temperature"
+    ],
+    "तापमान": [
+      "temperature"
+    ],
+    "तापमाप": [
+      "temperature"
+    ],
+    "kachra": [
+      "waste",
+      "garbage"
+    ],
+    "kooda": [
+      "waste",
+      "garbage"
+    ],
+    "kuda": [
+      "waste",
+      "garbage"
+    ],
+    "koora": [
+      "waste",
+      "garbage"
+    ],
+    "garbage": [
+      "waste",
+      "garbage"
+    ],
+    "कचरा": [
+      "waste",
+      "garbage"
+    ],
+    "कूडा": [
+      "waste",
+      "garbage"
+    ],
+    "गार्बेज": [
+      "waste",
+      "garbage"
+    ],
+    "geela": [
+      "wet",
+      "organic",
+      "biodegradable"
+    ],
+    "gila": [
+      "wet",
+      "organic",
+      "biodegradable"
+    ],
+    "geeli": [
+      "wet",
+      "organic",
+      "biodegradable"
+    ],
+    "गीला": [
+      "wet",
+      "organic",
+      "biodegradable"
+    ],
+    "गीली": [
+      "wet",
+      "organic",
+      "biodegradable"
+    ],
+    "sukha": [
+      "dry"
+    ],
+    "sookha": [
+      "dry"
+    ],
+    "सूखा": [
+      "dry"
+    ],
+    "सूखी": [
+      "dry"
+    ],
+    "nali": [
+      "drain",
+      "dump"
+    ],
+    "naali": [
+      "drain",
+      "dump"
+    ],
+    "नाली": [
+      "drain",
+      "dump"
+    ],
+    "nigam": [
+      "municipal",
+      "landfill"
+    ],
+    "nagarnigam": [
+      "municipal",
+      "landfill"
+    ],
+    "निगम": [
+      "municipal",
+      "landfill"
+    ],
+    "khad": [
+      "compost",
+      "fertilizer"
+    ],
+    "khaad": [
+      "compost",
+      "fertilizer"
+    ],
+    "खाद": [
+      "compost",
+      "fertilizer"
+    ],
+    "plastic": [
+      "plastic",
+      "packaging"
+    ],
+    "polythene": [
+      "plastic",
+      "packaging"
+    ],
+    "panni": [
+      "plastic",
+      "packaging"
+    ],
+    "pannee": [
+      "plastic",
+      "packaging"
+    ],
+    "thaili": [
+      "plastic",
+      "packaging"
+    ],
+    "प्लास्टिक": [
+      "plastic",
+      "packaging"
+    ],
+    "पॉलीथिन": [
+      "plastic",
+      "packaging"
+    ],
+    "पन्नी": [
+      "plastic",
+      "packaging"
+    ],
+    "थैली": [
+      "plastic",
+      "packaging"
+    ],
+    "पैकेट": [
+      "packaging"
+    ],
+    "पैकिंग": [
+      "packaging"
+    ],
+    "jurmana": [
+      "penalty",
+      "fine",
+      "section",
+      "59",
+      "punishment"
+    ],
+    "jurmaana": [
+      "penalty",
+      "fine",
+      "section",
+      "59",
+      "punishment"
+    ],
+    "jarmana": [
+      "penalty",
+      "fine",
+      "section",
+      "59",
+      "punishment"
+    ],
+    "saza": [
+      "penalty",
+      "punishment",
+      "section",
+      "59"
+    ],
+    "sazaa": [
+      "penalty",
+      "punishment",
+      "section",
+      "59"
+    ],
+    "jail": [
+      "penalty",
+      "imprisonment",
+      "section",
+      "59"
+    ],
+    "dand": [
+      "penalty",
+      "punishment",
+      "section",
+      "59"
+    ],
+    "जुरमाना": [
+      "penalty",
+      "fine",
+      "section",
+      "59",
+      "punishment"
+    ],
+    "सजा": [
+      "penalty",
+      "punishment",
+      "section",
+      "59"
+    ],
+    "जेल": [
+      "penalty",
+      "imprisonment",
+      "section",
+      "59"
+    ],
+    "दंड": [
+      "penalty",
+      "punishment",
+      "section",
+      "59"
+    ],
+    "kanoon": [
+      "law",
+      "regulation"
+    ],
+    "kanun": [
+      "law",
+      "regulation"
+    ],
+    "qanoon": [
+      "law",
+      "regulation"
+    ],
+    "niyam": [
+      "law",
+      "regulation"
+    ],
+    "कानून": [
+      "law",
+      "regulation"
+    ],
+    "नियम": [
+      "law",
+      "regulation"
+    ],
+    "धारा": [
+      "section"
+    ],
+    "dhara": [
+      "section"
+    ],
+    "licence": [
+      "licence",
+      "registration",
+      "fbo"
+    ],
+    "license": [
+      "licence",
+      "registration",
+      "fbo"
+    ],
+    "lisence": [
+      "licence",
+      "registration",
+      "fbo"
+    ],
+    "registration": [
+      "licence",
+      "registration",
+      "fbo"
+    ],
+    "panjikaran": [
+      "licence",
+      "registration",
+      "fbo"
+    ],
+    "लाइसेंस": [
+      "licence",
+      "registration",
+      "fbo"
+    ],
+    "रजिस्ट्रेशन": [
+      "licence",
+      "registration",
+      "fbo"
+    ],
+    "पंजीकरण": [
+      "licence",
+      "registration",
+      "fbo"
+    ],
+    "hisaab": [
+      "record",
+      "records"
+    ],
+    "hisab": [
+      "record",
+      "records"
+    ],
+    "हिसाब": [
+      "record",
+      "records"
+    ],
+    "रिकॉर्ड": [
+      "record",
+      "records"
+    ],
+    "gaay": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "gai": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "gau": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "gaaye": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "gaayen": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "gaiyan": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "gaumata": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "gaushala": [
+      "gaushala",
+      "cow",
+      "cattle"
+    ],
+    "goshala": [
+      "gaushala",
+      "cow",
+      "cattle"
+    ],
+    "gaushalayen": [
+      "gaushala",
+      "cow",
+      "cattle"
+    ],
+    "गाय": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "गायें": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "गाए": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "गौ": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "गौमाता": [
+      "cow",
+      "cattle",
+      "bovine"
+    ],
+    "गौशाला": [
+      "gaushala",
+      "cow",
+      "cattle"
+    ],
+    "गोशाला": [
+      "gaushala",
+      "cow",
+      "cattle"
+    ],
+    "bhains": [
+      "buffalo",
+      "cattle",
+      "livestock"
+    ],
+    "bhens": [
+      "buffalo",
+      "cattle",
+      "livestock"
+    ],
+    "bhais": [
+      "buffalo",
+      "cattle",
+      "livestock"
+    ],
+    "bhainse": [
+      "buffalo",
+      "cattle",
+      "livestock"
+    ],
+    "भैंस": [
+      "buffalo",
+      "cattle",
+      "livestock"
+    ],
+    "भैंसें": [
+      "buffalo",
+      "cattle",
+      "livestock"
+    ],
+    "bakri": [
+      "goat",
+      "livestock"
+    ],
+    "bakre": [
+      "goat",
+      "livestock"
+    ],
+    "बकरी": [
+      "goat",
+      "livestock"
+    ],
+    "बकरे": [
+      "goat",
+      "livestock"
+    ],
+    "bhed": [
+      "sheep",
+      "livestock"
+    ],
+    "भेड": [
+      "sheep",
+      "livestock"
+    ],
+    "suar": [
+      "pig",
+      "livestock"
+    ],
+    "sooar": [
+      "pig",
+      "livestock"
+    ],
+    "सूअर": [
+      "pig",
+      "livestock"
+    ],
+    "murgi": [
+      "poultry",
+      "chicken",
+      "meat"
+    ],
+    "murga": [
+      "poultry",
+      "chicken",
+      "meat"
+    ],
+    "मुर्गी": [
+      "poultry",
+      "chicken",
+      "meat"
+    ],
+    "मुर्गा": [
+      "poultry",
+      "chicken",
+      "meat"
+    ],
+    "kutta": [
+      "dog",
+      "animal"
+    ],
+    "kutte": [
+      "dog",
+      "animal"
+    ],
+    "कुत्ता": [
+      "dog",
+      "animal"
+    ],
+    "कुत्ते": [
+      "dog",
+      "animal"
+    ],
+    "janwar": [
+      "animal",
+      "livestock"
+    ],
+    "janwaron": [
+      "animal",
+      "livestock"
+    ],
+    "pashu": [
+      "animal",
+      "livestock"
+    ],
+    "pashuon": [
+      "animal",
+      "livestock"
+    ],
+    "maweshi": [
+      "animal",
+      "livestock"
+    ],
+    "जानवर": [
+      "animal",
+      "livestock"
+    ],
+    "जानवरों": [
+      "animal",
+      "livestock"
+    ],
+    "पशु": [
+      "animal",
+      "livestock"
+    ],
+    "पशुओं": [
+      "animal",
+      "livestock"
+    ],
+    "मवेशी": [
+      "animal",
+      "livestock"
+    ],
+    "chara": [
+      "feed",
+      "animal"
+    ],
+    "chaara": [
+      "feed",
+      "animal"
+    ],
+    "चारा": [
+      "feed",
+      "animal"
+    ],
+    "gosht": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "mutton": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "maans": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "mans": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "nonveg": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "मांस": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "गोश्त": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "मटन": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "नॉनवेज": [
+      "meat",
+      "non-vegetarian"
+    ],
+    "daan": [
+      "donate"
+    ],
+    "दान": [
+      "donate"
+    ],
+    "bacha": [
+      "surplus",
+      "leftover"
+    ],
+    "bachi": [
+      "surplus",
+      "leftover"
+    ],
+    "bache": [
+      "surplus",
+      "leftover"
+    ],
+    "bachat": [
+      "surplus",
+      "leftover"
+    ],
+    "बचा": [
+      "surplus",
+      "leftover"
+    ],
+    "बची": [
+      "surplus",
+      "leftover"
+    ],
+    "बचे": [
+      "surplus",
+      "leftover"
+    ],
+    "बचत": [
+      "surplus",
+      "leftover"
+    ],
+    "jutha": [
+      "swill",
+      "leftover",
+      "catering"
+    ],
+    "joothan": [
+      "swill",
+      "leftover",
+      "catering"
+    ],
+    "juthan": [
+      "swill",
+      "leftover",
+      "catering"
+    ],
+    "जूठन": [
+      "swill",
+      "leftover",
+      "catering"
+    ],
+    "झूठन": [
+      "swill",
+      "leftover",
+      "catering"
+    ],
+    "tel": [
+      "oil",
+      "cooking",
+      "used"
+    ],
+    "तेल": [
+      "oil",
+      "cooking",
+      "used"
+    ],
+    "khana": [
+      "food"
+    ],
+    "khane": [
+      "food"
+    ],
+    "khaana": [
+      "food"
+    ],
+    "खाना": [
+      "food"
+    ],
+    "खाने": [
+      "food"
+    ],
+    "भोजन": [
+      "food"
+    ],
+    "bhojan": [
+      "food"
+    ],
+    "जुर्माना": [
+      "penalty",
+      "fine",
+      "section",
+      "59",
+      "punishment"
+    ],
+    "जुर्माने": [
+      "penalty",
+      "fine",
+      "section",
+      "59",
+      "punishment"
+    ]
+  },
+  "prefixes": {
+    "khila": [
+      "feed"
+    ],
+    "खिला": [
+      "feed"
+    ],
+    "khilaa": [
+      "feed"
+    ],
+    "baant": [
+      "distribute",
+      "donate",
+      "surplus"
+    ],
+    "बांट": [
+      "distribute",
+      "donate",
+      "surplus"
+    ],
+    "बाँट": [
+      "distribute",
+      "donate",
+      "surplus"
+    ],
+    "bech": [
+      "sell",
+      "distribute"
+    ],
+    "बेच": [
+      "sell",
+      "distribute"
+    ],
+    "bikri": [
+      "sell",
+      "distribute"
+    ],
+    "बिक्री": [
+      "sell",
+      "distribute"
+    ],
+    "phenk": [
+      "dump",
+      "dispose",
+      "landfill"
+    ],
+    "fenk": [
+      "dump",
+      "dispose",
+      "landfill"
+    ],
+    "phek": [
+      "dump",
+      "dispose",
+      "landfill"
+    ],
+    "फेंक": [
+      "dump",
+      "dispose",
+      "landfill"
+    ],
+    "nikal": [
+      "expired"
+    ],
+    "निकल": [
+      "expired"
+    ]
+  },
+  "phrases": {
+    "date nikal": [
+      "expired",
+      "expiry"
+    ],
+    "date khatam": [
+      "expired",
+      "expiry"
+    ],
+    "date nikal gayi": [
+      "expired",
+      "expiry"
+    ],
+    "तारीख निकल": [
+      "expired",
+      "expiry"
+    ],
+    "तारीख खत्म": [
+      "expired",
+      "expiry"
+    ],
+    "डेट निकल": [
+      "expired",
+      "expiry"
+    ],
+    "डेट खत्म": [
+      "expired",
+      "expiry"
+    ],
+    "purana tel": [
+      "used",
+      "cooking",
+      "oil"
+    ],
+    "jala hua tel": [
+      "used",
+      "cooking",
+      "oil"
+    ],
+    "पुराना तेल": [
+      "used",
+      "cooking",
+      "oil"
+    ],
+    "जला हुआ तेल": [
+      "used",
+      "cooking",
+      "oil"
+    ],
+    "de sakte": [
+      "donate"
+    ],
+    "de sakta": [
+      "donate"
+    ],
+    "de sakti": [
+      "donate"
+    ],
+    "दे सकते": [
+      "donate"
+    ],
+    "दे सकता": [
+      "donate"
+    ],
+    "kitni der": [
+      "hours",
+      "holding",
+      "time"
+    ],
+    "kitne ghante": [
+      "hours",
+      "holding",
+      "time"
+    ],
+    "कितनी देर": [
+      "hours",
+      "holding",
+      "time"
+    ],
+    "कितने घंटे": [
+      "hours",
+      "holding",
+      "time"
+    ],
+    "rakh sakte": [
+      "holding",
+      "storage"
+    ],
+    "रख सकते": [
+      "holding",
+      "storage"
+    ],
+    "nagar nigam": [
+      "municipal",
+      "landfill"
+    ],
+    "नगर निगम": [
+      "municipal",
+      "landfill"
+    ],
+    "bacha hua": [
+      "surplus",
+      "leftover"
+    ],
+    "bachi hui": [
+      "surplus",
+      "leftover"
+    ],
+    "बचा हुआ": [
+      "surplus",
+      "leftover"
+    ],
+    "बची हुई": [
+      "surplus",
+      "leftover"
+    ],
+    "kam ho gaya": [
+      "spoiled"
+    ],
+    "kharab ho gaya": [
+      "spoiled",
+      "unfit"
+    ],
+    "खराब हो गया": [
+      "spoiled",
+      "unfit"
+    ],
+    "खराब हो गई": [
+      "spoiled",
+      "unfit"
+    ],
+    "gila kachra": [
+      "wet",
+      "waste",
+      "organic",
+      "biodegradable"
+    ],
+    "geela kachra": [
+      "wet",
+      "waste",
+      "organic",
+      "biodegradable"
+    ],
+    "गीला कचरा": [
+      "wet",
+      "waste",
+      "organic",
+      "biodegradable"
+    ],
+    "sukha kachra": [
+      "dry",
+      "waste"
+    ],
+    "सूखा कचरा": [
+      "dry",
+      "waste"
+    ]
+  },
+  "hinglish_markers": [
+    "kya",
+    "hai",
+    "hain",
+    "nahi",
+    "nahin",
+    "kaise",
+    "kahan",
+    "kitna",
+    "kitni",
+    "kitne",
+    "karna",
+    "karen",
+    "kare",
+    "karu",
+    "karein",
+    "sakte",
+    "sakta",
+    "sakti",
+    "chahiye",
+    "mein",
+    "kisi",
+    "hua",
+    "hui",
+    "gaya",
+    "gayi",
+    "liye",
+    "mujhe",
+    "kyun",
+    "kyon",
+    "agar",
+    "aur",
+    "phenken",
+    "ka",
+    "ki",
+    "ke",
+    "ko",
+    "se",
+    "bhi",
+    "toh",
+    "lagta",
+    "lagti",
+    "hoga",
+    "hogi",
+    "kab",
+    "kaun"
+  ],
+  "greetings": [
+    "hi",
+    "hii",
+    "hello",
+    "hey",
+    "heyy",
+    "namaste",
+    "namaskar",
+    "pranam",
+    "good",
+    "morning",
+    "evening",
+    "afternoon",
+    "नमस्ते",
+    "नमस्कार",
+    "प्रणाम",
+    "हेलो",
+    "हैलो"
+  ]
+}

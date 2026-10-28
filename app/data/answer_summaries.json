@@ -1,0 +1,252 @@
+{
+  "_about": "Short plain-language answers for each regulation in regulations.json, in English and Hindi. They only restate what that regulation's own text says (no new law). Keyed by regulation id. 'action_hi' is the Hindi form of the regulation's FoodLoop rule. 'extra_keywords' help search find the rule. A native Hindi speaker should review the Hindi before launch.",
+  "FSSAI-SURPLUS-2019-C3": {
+    "short": "Only FSSAI-registered or licensed food businesses can recover or dispose of surplus food. Separate food that is fit to eat from spoiled food at the source, and keep records of the date, the kind of food, the quantity and who received it.",
+    "short_hi": "बचा हुआ खाना बचाने या निपटाने वाला हर फूड बिज़नेस FSSAI में रजिस्टर्ड या लाइसेंस वाला होना चाहिए। खाने लायक खाना और ख़राब खाना शुरू में ही अलग रखें। तारीख़, खाने का प्रकार, मात्रा और किसे दिया गया, इसका रिकॉर्ड रखें।",
+    "action_hi": "FoodLoop पिकअप से पहले बिज़नेस का FSSAI रजिस्ट्रेशन जाँचता है।",
+    "extra_keywords": [
+      "donate",
+      "donation",
+      "leftover",
+      "leftovers",
+      "who can donate",
+      "registered",
+      "records",
+      "segregate",
+      "ngo"
+    ]
+  },
+  "FSSAI-SURPLUS-2019-C4": {
+    "short": "Hot cooked food must be kept at 65°C or above until it is delivered, and cold perishables such as dairy and cut fruit below 5°C. Cooked food kept at room temperature must be used within 4 hours; after that it must not be eaten and can only go to compost or biogas.",
+    "short_hi": "गर्म पका खाना पहुँचाने तक 65°C या उससे ऊपर रखें। दूध-दही और कटे फल जैसी ठंडी चीज़ें 5°C से नीचे रखें। कमरे के तापमान पर रखा पका खाना बनने के 4 घंटे के अंदर इस्तेमाल करें। 4 घंटे बाद उसे खाना मना है और वह सिर्फ़ कंपोस्ट या बायोगैस में जाएगा।",
+    "action_hi": "तय समय से ज़्यादा रखा पका खाना FoodLoop में सिर्फ़ टियर D (बायोगैस/कंपोस्ट) में जाता है।",
+    "extra_keywords": [
+      "room temperature",
+      "hours",
+      "how long",
+      "leftover cooked",
+      "keep",
+      "store",
+      "storage",
+      "fridge",
+      "refrigerator",
+      "reheat"
+    ]
+  },
+  "FSSAI-SURPLUS-2019-C5": {
+    "short": "Food that is past its expiry date or use-by date, or that shows spoilage (mold, fermentation, bad smell, insects or slime), is unfit for people. It cannot be sold, donated, processed or put back into food manufacturing, and it can go only to certified compost or biogas.",
+    "short_hi": "जिस खाने की एक्सपायरी निकल चुकी है या जिसमें फफूंद, ख़मीर उठना, बदबू, कीड़े या चिपचिपापन दिखे, वह इंसानों के खाने लायक नहीं माना जाता। उसे बेचना, दान करना, प्रोसेस करना या खाने के उत्पाद में दोबारा इस्तेमाल करना मना है। उसे सिर्फ़ प्रमाणित कंपोस्ट या बायोगैस प्लांट में भेजें।",
+    "action_hi": "एक्सपायर्ड या ख़राब माल अपने-आप टियर B और C से बाहर हो जाता है। सिर्फ़ टियर D (प्रमाणित कंपोस्ट/बायोगैस) की अनुमति है।",
+    "extra_keywords": [
+      "stale",
+      "rotten",
+      "fungus",
+      "expire",
+      "expiry date",
+      "spoilage",
+      "unfit",
+      "bad",
+      "off",
+      "smell",
+      "insects",
+      "sell expired",
+      "donate expired",
+      "insect",
+      "infestation",
+      "worms",
+      "insects found",
+      "slime",
+      "fermented",
+      "smelly",
+      "sour",
+      "bad smell",
+      "past date"
+    ]
+  },
+  "FSSAI-FEED-2021-SWILL": {
+    "short": "Feeding catering waste, meat scraps or poultry-contaminated swill to cattle, sheep, goats or other livestock is illegal. Animal feed may only use clean, unexpired, vegetarian surplus such as bakery scraps, non-moldy grain and clean fruit or vegetable trimmings. Expired or moldy food, meat and dairy waste cannot go into feed.",
+    "short_hi": "पशुओं (गाय, भैंस, भेड़, बकरी आदि) को कैटरिंग का बचा खाना, मांस के टुकड़े या पोल्ट्री से दूषित जूठन खिलाना क़ानूनन मना है। पशु चारे में सिर्फ़ साफ़, बिना एक्सपायर, शाकाहारी बचा सामान जा सकता है, जैसे बेकरी का बचा सामान, फफूंद-रहित अनाज और साफ़ फल-सब्ज़ी के छिलके। एक्सपायर्ड या फफूंद लगा खाना, मांस और डेयरी का कचरा चारे में नहीं जा सकता।",
+    "action_hi": "टियर C (चारा) सिर्फ़ बिना एक्सपायर, शाकाहारी बेकरी, अनाज, फल और सब्ज़ी के बचे सामान के लिए है। एक्सपायर्ड, मांस और डेयरी कचरा टियर C में नहीं जाता।",
+    "extra_keywords": [
+      "feed animals",
+      "feeding animals",
+      "dog",
+      "pig",
+      "goat",
+      "buffalo",
+      "poultry",
+      "chicken",
+      "leftover meat",
+      "bones",
+      "scraps",
+      "tier c"
+    ]
+  },
+  "FSSAI-FEED-GAUSHALA-ROTI": {
+    "short": "Yes, with conditions: clean, dry, mold-free, vegetarian rotis, chapatis and bread can be given to registered gaushalas as cattle feed. Rotis with mold, wet rotis kept in humid containers for more than 24 hours, and rotis mixed with spicy or oily curry, dal or non-veg waste must not be fed to animals; they go to compost or biogas.",
+    "short_hi": "हाँ, शर्तों के साथ: साफ़, सूखी, फफूंद-रहित और शाकाहारी रोटी, चपाती और ब्रेड रजिस्टर्ड गौशाला को पशु चारे के रूप में दी जा सकती है। फफूंद लगी रोटी, 24 घंटे से ज़्यादा नमी वाले डिब्बे में रखी गीली रोटी, या तेल-मसाले वाली सब्ज़ी, दाल या नॉन-वेज जूठन में मिली रोटी पशुओं को न खिलाएँ। ऐसी रोटी कंपोस्ट या बायोगैस में भेजें।",
+    "action_hi": "FoodLoop साफ़ सूखी रोटी को टियर C (गौशाला/पशु चारा) के लिए मंज़ूर करता है। फफूंद या सब्ज़ी-दाल में भीगी रोटी को टियर D (बायोगैस/कंपोस्ट) में भेजता है।",
+    "extra_keywords": [
+      "stale roti",
+      "old roti",
+      "leftover roti",
+      "bread to cows",
+      "feed cows",
+      "feed cow",
+      "cow feed",
+      "donate roti",
+      "temple",
+      "langar",
+      "prasad"
+    ]
+  },
+  "CPCB-SWM-2016-R4": {
+    "short": "Restaurants, hotels and other commercial establishments must separate their waste at source into biodegradable (wet), non-biodegradable recyclable and domestic hazardous streams. Food waste must never be mixed with plastic, metal or hazardous waste, and bulk generators must send organic waste to bio-methanation or licensed composting, not to a landfill.",
+    "short_hi": "रेस्टोरेंट, होटल और दूसरे व्यावसायिक प्रतिष्ठानों को कचरा शुरू में ही अलग करना होता है: जैविक (गीला), रीसाइकिल होने वाला और घरेलू ख़तरनाक कचरा। खाने का कचरा प्लास्टिक, धातु या ख़तरनाक कचरे में न मिलाएँ। बड़े कचरा पैदा करने वाले जैविक कचरा बायोमीथेनेशन या लाइसेंस वाली कंपोस्टिंग यूनिट में भेजें, लैंडफ़िल में नहीं।",
+    "action_hi": "FoodLoop पैकेजिंग अलग करवाता है (टियर E) और बड़ी मात्रा के जैविक कचरे को प्रमाणित कंपोस्ट/बायोगैस (टियर D) में भेजता है।",
+    "extra_keywords": [
+      "wet waste",
+      "dry waste",
+      "kitchen waste",
+      "garbage",
+      "dump",
+      "throw",
+      "dispose",
+      "disposal",
+      "segregate",
+      "separate",
+      "dustbin",
+      "landfill",
+      "bin"
+    ]
+  },
+  "CPCB-SWM-2016-R14": {
+    "short": "Composting and biogas plants that take commercial food waste must hold a valid State Pollution Control Board Consent to Operate and meet leachate, odour and temperature standards (at least 55°C for 3 days when composting). Dumping food waste in the open is an environmental violation.",
+    "short_hi": "व्यावसायिक खाने का कचरा लेने वाले कंपोस्ट और बायोगैस प्लांट के पास राज्य प्रदूषण नियंत्रण बोर्ड की वैध अनुमति (CTO) होनी चाहिए। उन्हें रिसाव (लीचेट), बदबू और तापमान के मानक पूरे करने होंगे (कंपोस्टिंग में कम से कम 55°C, लगातार 3 दिन)। खाने का कचरा खुले में फेंकना पर्यावरण नियमों का उल्लंघन है।",
+    "action_hi": "टियर D का कचरा भेजने से पहले FoodLoop एडमिन प्लांट का प्रमाणपत्र जाँचता है।",
+    "extra_keywords": [
+      "certified plant",
+      "certified facility",
+      "certificate",
+      "consent to operate",
+      "open dumping",
+      "compost plant",
+      "biogas plant",
+      "pollution board",
+      "spcb",
+      "cto"
+    ]
+  },
+  "FSSA-2006-SEC59": {
+    "short": "Distributing unsafe food is a criminal offence. With no injury the fine can be up to ₹1,00,000; with non-grievous injury, up to 1 year in prison and a fine up to ₹3,00,000; with grievous injury or death, 7 years to life imprisonment and a fine of at least ₹10,00,000.",
+    "short_hi": "असुरक्षित खाना बनाना, रखना, बेचना या बाँटना आपराधिक अपराध है। किसी को नुकसान न हुआ हो तो जुर्माना ₹1,00,000 तक हो सकता है। गैर-गंभीर चोट पर 1 साल तक की जेल और ₹3,00,000 तक जुर्माना। गंभीर चोट या मृत्यु होने पर 7 साल से उम्रक़ैद तक की सज़ा और कम से कम ₹10,00,000 का जुर्माना।",
+    "action_hi": "FoodLoop के टियर लॉक एक्सपायर्ड या ख़राब माल को इंसानों या पशुओं के प्रोसेसर तक जाने ही नहीं देते, इससे आपका बिज़नेस सुरक्षित रहता है।",
+    "extra_keywords": [
+      "penalty",
+      "fine",
+      "punishment",
+      "jail",
+      "prison",
+      "how much fine",
+      "punish",
+      "caught",
+      "offence",
+      "crime",
+      "case",
+      "sell expired food"
+    ]
+  },
+  "FSSAI-SURPLUS-2019-C6": {
+    "short": "Every surplus or waste consignment must be traceable from source to destination, with batch details, dispatch time, the disposal route and the receiving facility, plus tamper-evident paperwork proving it reached a certified recovery centre. FoodLoop's hash-chained disposal records are designed for this.",
+    "short_hi": "बचा हुआ या निपटाया जाने वाला हर माल शुरू से अंत तक ट्रैक होना चाहिए: बैच की जानकारी, भेजने का समय, निपटान का रास्ता और पाने वाला प्लांट दर्ज हों। साथ में छेड़छाड़-रोधी काग़ज़ात हों जो साबित करें कि माल प्रमाणित केंद्र तक पहुँचा। FoodLoop के हैश-चेन वाले निपटान रिकॉर्ड इसी काम के लिए बने हैं।",
+    "action_hi": "FoodLoop के हैश-चेन वाले निपटान रिकॉर्ड (FL-YYYY-XXXXX) इस नियम की ज़रूरत पूरी करते हैं।",
+    "extra_keywords": [
+      "proof",
+      "record",
+      "records",
+      "prove",
+      "document",
+      "documents",
+      "paperwork",
+      "delivery proof",
+      "audit",
+      "tracking",
+      "inspection",
+      "inspector"
+    ]
+  },
+  "FSSAI-RUCO-2018-UCO": {
+    "short": "Used cooking oil with Total Polar Compounds above 25% is hazardous and must not be reused or blended back into food. A business using more than 50 litres of oil a day must keep an oil logbook and hand used oil only to FSSAI-authorised biodiesel collectors. Pouring it into drains or on open land is prohibited.",
+    "short_hi": "जिस खाना पकाने के तेल में टोटल पोलर कंपाउंड (TPC) 25% से ज़्यादा हो, वह सेहत के लिए ख़तरनाक है और उसे दोबारा खाने में इस्तेमाल करना या मिलाना मना है। रोज़ 50 लीटर से ज़्यादा तेल इस्तेमाल करने वाले बिज़नेस को तेल का लॉगबुक रखना होगा और इस्तेमाल किया हुआ तेल सिर्फ़ FSSAI-अधिकृत बायोडीज़ल कलेक्टर को देना होगा। इसे नाली या खुली ज़मीन पर डालना मना है।",
+    "action_hi": "FoodLoop इस्तेमाल किया तेल सिर्फ़ प्रमाणित टियर E (रीसाइक्लिंग/बायोडीज़ल) में भेजता है।",
+    "extra_keywords": [
+      "oil",
+      "old oil",
+      "frying oil",
+      "fry oil",
+      "cooking oil",
+      "reuse oil",
+      "pour oil",
+      "tel",
+      "frying",
+      "burnt oil",
+      "oil disposal"
+    ]
+  },
+  "CPCB-PWM-2021-PKG": {
+    "short": "Food waste that comes in plastic, sachets, polybags or foil must be unpacked before it goes to composting or biogas, because plastic contaminates the compost. Clean packaging goes to recycling.",
+    "short_hi": "प्लास्टिक, सैशे, पॉलीबैग या फ़ॉयल में पैक खाने का कचरा कंपोस्ट या बायोगैस में डालने से पहले पैकिंग से अलग करना ज़रूरी है, क्योंकि प्लास्टिक कंपोस्ट को ख़राब करता है। साफ़ पैकेजिंग रीसाइक्लिंग में जाती है।",
+    "action_hi": "FoodLoop पैक किए माल पर पैकिंग हटाने का निशान लगाता है और साफ़ पैकेजिंग टियर E (रीसाइक्लिंग) में भेजता है।",
+    "extra_keywords": [
+      "unpack",
+      "remove packaging",
+      "wrapper",
+      "wrappers",
+      "packet",
+      "packets",
+      "pouch",
+      "packaged food",
+      "plastic",
+      "mix plastic",
+      "polythene"
+    ]
+  },
+  "FSSAI-COLD-2020-TRANSIT": {
+    "short": "Chilled food such as dairy and meat must be transported below 5°C continuously. If the temperature stays above 8°C for more than 2 hours in transit, the load counts as temperature-abused and cannot be sold or donated as food; it goes to compost or biogas.",
+    "short_hi": "दूध-दही और मांस जैसी ठंडी चीज़ें ढुलाई के दौरान लगातार 5°C से नीचे रखनी होती हैं। अगर तापमान 2 घंटे से ज़्यादा समय तक 8°C से ऊपर रहे, तो माल ख़राब (तापमान से नुकसान वाला) माना जाएगा और उसे खाने के लिए बेचा या दान नहीं किया जा सकता। उसे कंपोस्ट या बायोगैस में भेजें।",
+    "action_hi": "कोल्ड चेन टूटने वाला माल टियर B और C से बाहर होकर सीधे टियर D (बायोगैस/कंपोस्ट) में जाता है।",
+    "extra_keywords": [
+      "fridge failed",
+      "fridge broke",
+      "power cut",
+      "ac failed",
+      "freezer",
+      "refrigerated truck",
+      "reefer",
+      "transport",
+      "transit",
+      "delivery",
+      "milk",
+      "curd",
+      "yogurt",
+      "meat"
+    ]
+  },
+  "CPCB-BIO-2016-BWG": {
+    "short": "A business that produces more than 100 kg of waste a day is a bulk waste generator. It cannot hand over unsegregated organic waste to the municipal vehicle for landfill. It must process wet waste on site (composting or bio-methanation) or use an authorised off-site recovery service.",
+    "short_hi": "जो संस्था रोज़ 100 kg से ज़्यादा कचरा निकालती है, वह बल्क वेस्ट जनरेटर मानी जाती है। वह बिना अलग किया जैविक कचरा नगर निगम की गाड़ी को लैंडफ़िल के लिए नहीं दे सकती। गीले कचरे को वहीं कंपोस्टिंग या बायोमीथेनेशन से निपटाना होगा, या किसी अधिकृत बाहरी रिकवरी सेवा को देना होगा।",
+    "action_hi": "FoodLoop का डिजिटल डिस्पैच प्रमाण दिखाता है कि आपका कचरा लैंडफ़िल में नहीं गया।",
+    "extra_keywords": [
+      "100 kg",
+      "bulk",
+      "hotel waste",
+      "banquet waste",
+      "wedding waste",
+      "landfill",
+      "municipal",
+      "nagar nigam",
+      "on-site",
+      "large kitchen"
+    ]
+  }
+}
